@@ -1,4 +1,4 @@
 on:
     push:
       paths:
-      - 'doc/swagger.yml'
+      - '*doc/swagger.yml'
