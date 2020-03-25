@@ -12,7 +12,7 @@ info:
 host: $(catalog.host)
 basePath: /cross-recibos/api/v1
 tags:
-  - name: Recibos
+  - name: Recibos2
     description: >-
       Agrupa la funcionalidad relacionada a la operativa de recibos asociados a
       pólizas
