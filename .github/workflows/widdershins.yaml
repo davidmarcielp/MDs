@@ -1,0 +1,4 @@
+on:
+    push:
+      paths:
+      - 'doc/swagger.yml'
