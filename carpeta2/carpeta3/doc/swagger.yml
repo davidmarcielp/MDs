@@ -1,791 +1,1263 @@
-swagger: '2.0'
+openapi: 3.0.1
 info:
-  description: >-
-    API que recoge todas las funcionalidades relativas a los recibos gestionados
-    por la Mutua Madrileña en sus distintos ramos.
-  version: 1.1.0
-  title: CROSS - RECIBOS
+  title: MasMovil Ticketing API - Inbound (External Systems > MasMovil)
+  description: This is the ticketing-api server.
   contact:
-    name: Javier Moreno Lozano
-    email: jmoreno@mutua.es
-  x-ibm-name: cross-recibos
-host: $(catalog.host)
-basePath: /cross-recibos/api/v1
+    email: ticketing_squad@masmovil.com
+  version: 1.1.8
+servers:
+- url: '{protocol}://{environment}'
+  variables:
+    protocol:
+      default: https
+      enum:
+      - https
+      - http
+    environment:
+      default: ticketing.dev.k8s.masmovil.com/v1/api
+      enum:
+      - 0.0.0.0:8080
+      - ticketing.dev.k8s.masmovil.com/v1/api
+      - ticketing.private.sta.k8s.masmovil.com/v1/api
 tags:
-  - name: Recibos
-    description: >-
-      Agrupa la funcionalidad relaciounada a la operativa de recibos asociados a
-      pólizas
-  - name: Documentación
-    description: >-
-      Agrupa la funcionalidad relacionada a la operativa de la documentación de
-      los recibos asociados a pólizas
-  - name: Pagos
-    description: >-
-      Agrupa la funcionalidad relacionada a la operativa de los pagos asociados
-      a pólizas
-schemes:
-  - https
-consumes:
-  - application/json
-produces:
-  - application/json
-  - student
-security:
-  - clientIdHeader: []
+- name: Ticket
+  description: Operations about Tickets
 paths:
-  '/recibos/{id-recibo}':
-    get:
-      tags:
-        - Recibos
-      summary: Consulta del detalle de un recibo
-      description: Operación que permite realizar la consulta del detalle de un recibo
-      operationId: recuperarDetalleRecibo
-      parameters:
-        - name: id-recibo
-          in: path
-          description: Identificador del recibo
-          required: true
-          type: string
-      responses:
-        '200':
-          description: 200 OK - Recupera el detalle del recibo de una poliza
-          schema:
-            $ref: '#/definitions/Recibo'
-        '400':
-          description: 400 Bad Request
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
-          schema:
-            $ref: '#/definitions/Mensajes'
-  '/recibos/{id-recibo}/reenvios-bancos':
+  /ticket:
     post:
       tags:
-        - Pagos
-      summary: >-
-        Confirma a Mutua que puede volver a enviar al banco el recibo que fue
-        devuelto y se quedó sin cobrar
-      description: >-
-        Operación que permite confirmar a Mutua que puede volver a enviar al
-        banco el recibo que fue devuelto y se quedó sin cobrar
-      operationId: crearSolicitudReenvioBancoRecibo
+      - Ticket
+      summary: Create new ticket
+      description: Creates a ticket in MasMovil ticketing tool.
+      operationId: createTicket
       parameters:
-        - name: id-recibo
-          in: path
-          description: Identificador del recibo
-          required: true
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
+      requestBody:
+        description: Fields needed to create a ticket in MasMovil Ticketing tool
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              NetworkIncident:
+                $ref: '#/components/examples/NetworkIncident'
+              FTTHFault:
+                $ref: '#/components/examples/FTTHFault'
+        required: true
       responses:
-        '201':
-          description: 201 OK - Confirma el envío del recibo al banco
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '400':
-          description: 400 Bad Request
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
-          schema:
-            $ref: '#/definitions/Mensajes'
-  '/recibos/{id-recibo}/pdf':
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+  /ticket/{ticketId}:
     get:
       tags:
-        - Documentación
-      summary: Obtiene un documento con los datos del recibo en formato PDF
-      description: Operación que permite obtener un documento con los datos del recibo
-      operationId: recuperarDocumentoRecibo
+      - Ticket
+      summary: Get a ticket by id
+      description: Retrieves the details of a ticket that has previously been created.
+      operationId: getTicketById
       parameters:
-        - name: id-recibo
-          in: path
-          description: Identificador del recibo
-          required: true
+      - name: ticketId
+        in: path
+        description: The Ticket ID in MasMovil ticketing tool. You can use either
+          ID or KEY.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: expand
+        in: query
+        description: Filter for ticket response body. (You must add 'attachment' query
+          param to get ticket attachments in response body)
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - attachment
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
       responses:
-        '200':
-          description: 200 OK - Recupera el documento del recibo de una poliza
-          schema:
-            $ref: '#/definitions/Documento'
-        '400':
-          description: 400 Bad Request
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
-          schema:
-            $ref: '#/definitions/Mensajes'
-  '/recibos/{id-recibo}/carta':
+        "200":
+          description: Ticket response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+    patch:
+      tags:
+      - Ticket
+      summary: Update an existing ticket
+      description: |
+        This service can be used to update ticket information.
+
+        For udating ticket status, you must provide a transtition ID to apply. You can get this ID through this *GET* request: **/ticket/{ticketId}/transitions**
+
+        If your system needs to use a callback to send back information about previous MasMovil request, you must use this service using especified integration fields.
+      operationId: updateTicket
+      parameters:
+      - name: ticketId
+        in: path
+        description: The Ticket ID in MasMovil ticketing tool. You can use either
+          ID or KEY.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      requestBody:
+        description: |
+          Body must include the ticket fields that need to be updated.
+          See examples below.
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              UpdateStatus:
+                $ref: '#/components/examples/UpdateStatus'
+              UpdatePriority:
+                $ref: '#/components/examples/UpdatePriority'
+              UpdateGroup:
+                $ref: '#/components/examples/UpdateGroup'
+        required: true
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+  /ticket/{ticketId}/attachment:
     post:
       tags:
-        - Documentación
-      summary: Envía una solicitud de recepción del recibo en forma de carta
-      description: >-
-        Operación que permite enviar una solicitud de recepción del recibo en
-        forma de carta
-      operationId: solicitarReciboCarta
+      - Ticket
+      summary: Add attachment to ticket
+      operationId: addAttachment
       parameters:
-        - name: id-recibo
-          in: path
-          description: Identificador del recibo
-          required: true
+      - name: ticketId
+        in: path
+        description: The Ticket ID in MasMovil ticketing tool. You can use either
+          ID or KEY.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-        - name: direccionEnvio
-          in: query
-          description: Dirección a la cual se va a enviar el recibo en formato de carta
-          required: false
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
+      requestBody:
+        description: |
+          Both fields name and data are required.
+          Data must be base64 encoded.
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              Attachment:
+                $ref: '#/components/examples/Attachment'
+        required: true
       responses:
-        '201':
-          description: 201 OK - Envía la solicitud del recibo por carta
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '400':
-          description: 400 Bad Request
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
-          schema:
-            $ref: '#/definitions/Mensajes'
-  '/recibos/{id-recibo}/email':
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201_1'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+  /ticket/{ticketId}/comment:
     post:
       tags:
-        - Documentación
-      summary: Envía una solicitud de recepción del recibo en forma de email
-      description: >-
-        Operación que permite enviar una solicitud de recepción del recibo en
-        forma de email
-      operationId: solicitarReciboEmail
+      - Ticket
+      summary: Add comment to ticket
+      operationId: addComment
       parameters:
-        - name: id-recibo
-          in: path
-          description: Identificador del recibo
-          required: true
+      - name: ticketId
+        in: path
+        description: The Ticket ID in MasMovil ticketing tool. You can use either
+          ID or KEY.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-        - name: direccionEmail
-          in: query
-          description: Dirección de email a la que se va a enviar el recibo
-          required: false
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
+      requestBody:
+        description: Property body is mandatory.
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              Comment:
+                $ref: '#/components/examples/Comment'
+        required: true
       responses:
-        '201':
-          description: 201 OK - Envía la solicitud del recibo por email
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '400':
-          description: 400 Bad Request
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
-          schema:
-            $ref: '#/definitions/Mensajes'
-  '/recibos/{id-recibo}/sms':
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201_2'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+  /ticket/{ticketId}/attachmentWithComment:
     post:
       tags:
-        - Documentación
-      summary: Envia una solicitud de recepción del recibo en forma de SMS
-      description: >-
-        Operación que permite enviar una solicitud de recepción del recibo en
-        forma de SMS
-      operationId: solicitarReciboSms
+      - Ticket
+      summary: Add attachment with comment to ticket
       parameters:
-        - name: id-recibo
-          in: path
-          description: Identificador del recibo
-          required: true
+      - name: ticketId
+        in: path
+        description: The Ticket ID in MasMovil ticketing tool. You can use either
+          ID or KEY.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-        - name: telefono
-          in: query
-          description: Número de teléfono al cual se va a enviar el recibo en formato SMS
-          required: false
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
+      requestBody:
+        description: Both comment and attachment are mandatory.
+        content:
+          application/json:
+            schema:
+              type: object
+            example:
+              comment:
+                body: Comment example [^attachment.txt]
+              attachment:
+                name: attachment.txt
+                data: R0lGODlhAQABAIAAAAUEBAAAACwAAAAAAQABAAACAkQBADs=
+        required: true
       responses:
-        '201':
-          description: 201 OK - Envía la solicitud del recibo por sms
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '400':
-          description: 400 Bad Request
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
-          schema:
-            $ref: '#/definitions/Mensajes'
-  '/polizas/{id-poliza}/recibos':
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201_3'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+  /ticket/field/{fieldName}:
     get:
       tags:
-        - Recibos
-      summary: Consulta de la lista de recibos de una póliza
-      description: >-
-        Operación que permite realizar la consulta de la lista de recibos de una
-        póliza
-      operationId: recuperarRecibosPoliza
+      - Ticket
+      summary: Get information about an API field. It returns info about MasMovil
+        ticketing tool field name and allowed values.
+      operationId: getFieldInformation
       parameters:
-        - name: id-poliza
-          in: path
-          description: Identificador de la póliza
-          required: true
+      - name: fieldName
+        in: path
+        description: The field name in MasMovil ticketing API.
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-        - name: estadoRecibo
-          in: query
-          description: Estado del recibo a consultar
-          required: false
+          example: customerSegment
+      - name: projectKey
+        in: query
+        description: The project key in MasMovil ticketing tool
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - MAS
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
-        - name: desdeFecha
-          in: query
-          description: Fecha a partir de la cual se consulta
-          required: true
-          type: string
-          format: date
-        - name: hastaFecha
-          in: query
-          description: Fecha hasta la cual se consulta
-          required: true
-          type: string
-          format: date
       responses:
-        '200':
-          description: >-
-            200 OK - Recupera los recibos vinculados a esa poliza según el
-            estado y fechas de consulta indicadas
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Item'
-        '400':
-          description: 400 Bad Request
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
-          schema:
-            $ref: '#/definitions/Mensajes'
-  '/recibos/{id-recibo}/movimientos':
+        "200":
+          description: Get field information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FieldResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+  /ticket/{ticketId}/transitions:
     get:
       tags:
-        - Recibos
-      summary: Consulta del historico de movimientos de un recibo
-      description: >-
-        Operación que permite realizar la consulta del historico de movimientos
-        de un recibo
-      operationId: recuperarMovimientosRecibo
+      - Ticket
+      summary: Get information about allowed transitions for a ticket.
+      operationId: getAllowedTransitions
       parameters:
-        - name: id-recibo
-          in: path
-          description: Identificador del recibo
-          required: true
+      - name: ticketId
+        in: path
+        description: The Ticket ID in MasMovil ticketing tool. You can use either
+          ID or KEY.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
       responses:
-        '200':
-          description: 200 OK - Recupera los movimientos historicos de un recibo
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/MovimientoRecibo'
-        '400':
-          description: 400 Bad Request
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
-          schema:
-            $ref: '#/definitions/Mensajes'
-  '/recibos/{id-recibo}/movimientos/{id-movimiento}':
+        "200":
+          description: Get transitions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransitionsResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+  /creationDataInfo:
     get:
       tags:
-        - Recibos
-      summary: Consulta del detalle de un movimiento de un recibo
-      description: >-
-        Operación que permite realizar la consulta del detalle del movimiento de
-        un recibo
-      operationId: recuperarMovimientoRecibo
+      - Ticket
+      summary: Get information about fields needed to create a given type of ticket
+      operationId: getFieldsForTicketType
       parameters:
-        - name: id-recibo
-          in: path
-          description: Identificador del recibo
-          required: true
-          type: string
-        - name: id-movimiento
-          in: path
-          description: Identificador del movimiento de un recibo
-          required: true
+      - name: projectKey
+        in: query
+        description: The project key in MasMovil ticketing tool
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - MAS
+      - name: ticketType
+        in: query
+        description: The ticket type in MasMovil ticketing tool
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - Avería (FTTH)
+            - Avería Cliente
+            - Incidencia
+            - Reclamación Instalación
+            - Cancelación Cliente
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
       responses:
-        '200':
-          description: 200 OK - Recupera el detalle del movimiento de un recibo
-          schema:
-            $ref: '#/definitions/MovimientoRecibo'
-        '400':
-          description: 400 Bad Request
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
-          schema:
-            $ref: '#/definitions/Mensajes'
-  '/recibos/{id-recibo}/confirmaciones-pagos':
+        "200":
+          description: Fields for ticket type
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreationDataInfo'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+  /project/ticketTypes:
+    get:
+      tags:
+      - Ticket
+      summary: Get information about ticket types per project
+      operationId: getTicketTypes
+      parameters:
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Get ticket types
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketTypesResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+  /ticket/{ticketId}/editableFields:
+    get:
+      tags:
+      - Ticket
+      summary: Get information about editable fields for a ticket
+      operationId: getEditableFields
+      parameters:
+      - name: ticketId
+        in: path
+        description: The Ticket ID in MasMovil ticketing tool. You can use either
+          ID or KEY.
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Editable Fields for ticket
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditableFields'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+  /search:
     post:
       tags:
-        - Pagos
-      summary: >-
-        Confirma a Mutua el pago de un recibo realizado por un cliente de forma
-        explícita, por ejemplo porque se quedó impagado o devuelto por el banco
-      description: >-
-        Operación que permite confirmar a Mutua el pago de un recibo realizado
-        por un cliente de forma explícita, por ejemplo porque se quedó impagado
-        o devuelto por el banco
-      operationId: crearPagoRecibo
+      - Ticket
+      summary: Search tickets
+      description: |
+        You can add fields to filter tickets. Allowed special opeators are $like:value and $in:[array], maxResults default results is 10.
+        Fields to return must be specified in "fields" json property.
+        Field names used in filters can be both Jira field name or ms-ticketing-API name, i.e.: you can use "customerDocument" or "Documento Cliente".
+      operationId: searchTickets
       parameters:
-        - name: id-recibo
-          in: path
-          description: Identificador del recibo
-          required: true
+      - name: x-api-key
+        in: header
+        required: true
+        style: simple
+        explode: false
+        schema:
           type: string
+      requestBody:
+        description: Filters to apply to search query
+        content:
+          application/json:
+            schema:
+              type: object
+            examples:
+              SearchExample:
+                $ref: '#/components/examples/SearchExample'
+        required: true
       responses:
-        '201':
-          description: 201 Confirma el pago de un recibo de forma explícita
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '400':
-          description: 400 Bad Request
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
-          schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
-          schema:
-            $ref: '#/definitions/Mensajes'
-  /recibos-by-nif:
-    get:
-      tags:
-        - Recibos
-      summary: Consulta de los recibos según NIF del cliente
-      description: Operación que permite la consulta de los recibos según NIF del cliente
-      operationId: recuperarRecibosPorNIF
-      parameters:
-        - name: nif
-          in: query
-          description: Identificador del documento de identidad de las personas
-          required: false
+        "200":
+          description: Ticket response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TicketResponse'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401'
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404'
+        "500":
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500'
+      security:
+      - bearerAuth: []
+components:
+  schemas:
+    TicketResponse:
+      type: object
+      properties:
+        id:
           type: string
-        - name: fechaConsulta
-          in: query
-          description: Fecha de consulta
-          required: true
+          example: "3240786"
+        status:
           type: string
-          format: date
-      responses:
-        '200':
-          description: 200 OK - Recupera los recibos del NIF del cliente
+          example: EN CURSO
+        summary:
+          type: string
+          example: ERI_MM_OLTZ3562010LAP012_para que se revise
+        description:
+          type: string
+          example: ERI_MM_OLTZ3562010LAP012_para que se revise
+        priority:
+          type: string
+          example: Medium
+        ticketType:
+          type: string
+          example: Incidencia Red
+        project:
+          type: string
+          example: IDR
+        createdDate:
+          type: string
+          example: 2018-02-28T17:43:38.000+0100
+        attachment:
+          $ref: '#/components/schemas/TicketResponse_attachment'
+    FieldResponse:
+      type: object
+      properties:
+        required:
+          type: boolean
+          example: true
+        name:
+          type: string
+          example: Titulo de la incidencia
+    CreationDataInfo:
+      type: object
+      properties:
+        subscriptionNumber:
+          $ref: '#/components/schemas/CreationDataInfo_subscriptionNumber'
+        icc:
+          $ref: '#/components/schemas/CreationDataInfo_icc'
+        contactEmail:
+          $ref: '#/components/schemas/CreationDataInfo_contactEmail'
+    EditableFields:
+      type: object
+      properties:
+        description:
+          $ref: '#/components/schemas/EditableFields_description'
+        customerPostalCode:
+          $ref: '#/components/schemas/EditableFields_customerPostalCode'
+        customerSegment:
+          $ref: '#/components/schemas/EditableFields_customerSegment'
+    FieldNotFound:
+      type: object
+      properties:
+        message:
+          type: string
+          example: We didn't found information about that field.
+    Error400:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "0015"
+        status:
+          type: string
+          example: BAD_REQUEST
+        message:
+          type: string
+          example: Bad Request
+        detailMsg:
+          type: string
+    Error401:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "0003"
+        status:
+          type: string
+          example: UNAUTHORIZED
+        message:
+          type: string
+          example: Unauthorized
+        detailMsg:
+          type: string
+    Error404:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "0004"
+        status:
+          type: string
+          example: NOT_FOUND
+        message:
+          type: string
+          example: Not found
+        detailMsg:
+          type: string
+          example: Resource not found
+    Error500:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "0002"
+        status:
+          type: string
+          example: UNEXPECTED
+        message:
+          type: string
+          example: Unexpected Error
+        detailMsg:
+          type: string
+    TransitionsResponse:
+      type: object
+      properties:
+        transitions:
+          type: array
+          example:
+          - id: 41
+            name: Reasignar
+            status: Asignado
+          - id: 21
+            name: Resolver
+            status: RESUELTO
+          items:
+            $ref: '#/components/schemas/TransitionsResponse_transitions'
+    TicketTypesResponse:
+      type: object
+      properties:
+        projects:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketTypesResponse_projects'
+    inline_response_201:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "123456789"
+        key:
+          type: string
+          example: '##-1234'
+    inline_response_201_1:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Attachment added successfully.
+    inline_response_201_2:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Comment added successfully.
+    inline_response_201_3:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Attachment with comment added successfully.
+    TicketResponse_attachment:
+      type: object
+      properties:
+        name:
+          type: string
+          example: attachment.txt
+        data:
+          type: string
+          example: SGVsbG8gd29ybGQgZnJvbSBNUywgY2hhbmdlZA==
+        mimeType:
+          type: string
+          example: multipart/form-data
+    CreationDataInfo_subscriptionNumber:
+      type: object
+      properties:
+        required:
+          type: boolean
+          example: true
+        name:
+          type: string
+          example: Suscripción
+    CreationDataInfo_icc:
+      type: object
+      properties:
+        required:
+          type: boolean
+          example: false
+        name:
+          type: string
+          example: ICC
+    CreationDataInfo_contactEmail:
+      type: object
+      properties:
+        required:
+          type: boolean
+          example: false
+        name:
+          type: string
+          example: Email del Cliente
+    EditableFields_description:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Descripción
+        required:
+          type: boolean
+          example: true
+    EditableFields_customerPostalCode:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Código Postal
+        required:
+          type: boolean
+          example: false
+    EditableFields_customerSegment_allowedValues:
+      type: object
+      properties:
+        value:
+          type: string
+    EditableFields_customerSegment:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Segmento Cliente
+        required:
+          type: boolean
+          example: false
+        allowedValues:
+          type: array
+          example:
+          - value: EMPRESA
+          - value: RESIDENCIAL
+          - value: HORECA
+          - value: AUTONOMO
+          items:
+            $ref: '#/components/schemas/EditableFields_customerSegment_allowedValues'
+    TransitionsResponse_transitions:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        status:
+          type: string
+    TicketTypesResponse_ticketTypes:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    TicketTypesResponse_projects:
+      type: object
+      properties:
+        key:
+          type: string
+        name:
+          type: string
+        ticketTypes:
+          type: array
+          items:
+            $ref: '#/components/schemas/TicketTypesResponse_ticketTypes'
+  responses:
+    TicketResponse:
+      description: Ticket response
+      content:
+        application/json:
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/Item'
-        '400':
-          description: 400 Bad Request
+            $ref: '#/components/schemas/TicketResponse'
+    FieldResponse:
+      description: Get field information
+      content:
+        application/json:
           schema:
-            $ref: '#/definitions/Mensajes'
-        '404':
-          description: 404 Not Found
+            $ref: '#/components/schemas/FieldResponse'
+    CreationDataInfo:
+      description: Fields for ticket type
+      content:
+        application/json:
           schema:
-            $ref: '#/definitions/Mensajes'
-        '500':
-          description: 500 Internal Error
+            $ref: '#/components/schemas/CreationDataInfo'
+    EditableFields:
+      description: Editable Fields for ticket
+      content:
+        application/json:
           schema:
-            $ref: '#/definitions/Mensajes'
-securityDefinitions:
-  clientIdHeader:
-    description: student
-    type: apiKey
-    name: X-IBM-Client-Id
-    in: header
-definitions:
-  Recibo:
-    properties:
-      datosBasicosRecibo:
-        description: Datos básicos del recibo
-        $ref: '#/definitions/DatosBasicosRecibo'
-      numeroPoliza:
+            $ref: '#/components/schemas/EditableFields'
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error400'
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error401'
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error404'
+    FieldNameNotFound:
+      description: Field name not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/FieldNotFound'
+    ServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error500'
+    TransitionsResponse:
+      description: Get transitions
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TransitionsResponse'
+    TicketTypes:
+      description: Get ticket types
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TicketTypesResponse'
+  parameters:
+    xApiKey:
+      name: x-api-key
+      in: header
+      required: true
+      style: simple
+      explode: false
+      schema:
         type: string
-        example: '25'
-        description: Número de póliza
-      movimientoPoliza:
+    ticketId:
+      name: ticketId
+      in: path
+      description: The Ticket ID in MasMovil ticketing tool. You can use either ID
+        or KEY.
+      required: true
+      style: simple
+      explode: false
+      schema:
         type: string
-        example: ACTIVA
-        description: Movimiento de la póliza al que se asocia al recibo
-      empresa:
-        type: string
-        example: Mutua
-        description: Empresa del recibo
-      ramo:
-        type: string
-        example: AUTOS
-        description: Ramo del recibo
-      anualidad:
-        type: string
-        example: '2018'
-        description: Anualidad de efecto del recibo
-      fechaEmision:
-        type: string
-        format: date
-        example: 21-06-2018
-        description: Fecha de puesto al cobro del recibo (remesado para banco)
-      fechaVencimiento:
-        type: string
-        format: date
-        example: 31-07-2018
-        description: Fin de vigencia del recibo
-      tipoRecibo:
-        type: string
-        example: Vencimiento
-        description: 'Tipo de recibo: vencimiento, nueva produción o suplemento'
-        enum:
-          - VENCIMIENTO
-          - NUEVA_PRODUCCCION
-          - SUPLEMENTOS
-      estadoRecibo:
-        type: string
-        example: Emitido
-        description: >-
-          Estado del recibo: emitido, retirado por suplemento, devuelto, anulado
-          emision o anulado falta de pago
-        enum:
-          - EMITIDO
-          - RETIRADO_POR_SUPLEMENTO
-          - DEVUELTO
-          - ANULADO_EMISION
-          - ANULADO_FALTA_PAGO
-      estadoCobroRecibo:
-        type: string
-        example: Pendiente poner al cobro
-        description: >-
-          Estado de cobro del recibo: pendiente poner al cobro, puesto al cobro
-          o fuera de cobro
-      nifRecibo:
-        type: string
-        example: 53450262X
-        description: NIF del pagador del recibo
-      cuentaBancaria:
-        description: Cuenta Bancaria asociada al pago de recibos de la póliza
-        $ref: '#/definitions/CuentaBancaria'
-      domicilioRecibo:
-        type: string
-        example: 'Avda. Albufera, 62'
-        description: Domicilio al que se asocia el recibo
-      movimientoRecibo:
-        description: Movimiento que origina el cambio sobre el recibo
-        $ref: '#/definitions/MovimientoRecibo'
-      motivoDevolucionAnulacion:
-        type: string
-        example: ANULADO POR IMPAGO
-        description: Motivo por el que se devuelve o anula un recibo
-      datosCobro:
-        description: Datos relativos al cobro de un recibo
-        $ref: '#/definitions/DatosCobro'
-    description: Agrupa los datos relativos a un recibo de pago de una póliza
-  DatosCobro:
-    required:
-      - datosBasicosCobro
-      - frecuenciaPago
-    properties:
-      datosBasicosCobro:
-        description: Datos básicos de cobro
-        $ref: '#/definitions/DatosBasicosCobro'
-      frecuenciaPago:
-        description: Frecuencia de pago
-        $ref: '#/definitions/FrecuenciaPago'
-    description: Agrupa los datos relativos a un cobro
-  DatosBasicosCobro:
-    required:
-      - datosCuentaBancaria
-    properties:
-      datosCuentaBancaria:
-        description: Datos de la cuenta bancaria
-        $ref: '#/definitions/CuentaBancaria'
-      formaPago:
-        type: string
-        example: BANCO
-        description: Formas de pagar un recibo
-        enum:
-          - BANCO
-          - TARJETA
-          - VENTANILLA
-          - DOMICILIADO
-          - EFECTIVO
-    description: Agrupa los datos básicos relativos a un cobro
-  CuentaBancaria:
-    required:
-      - iban
-      - idCuentaBancaria
-    properties:
-      idCuentaBancaria:
-        type: string
-        example: '01'
-        description: Identificador de la cuenta
-      tipoCuenta:
-        type: string
-        example: Ahorro
-        description: Tipo de cuenta
-      iban:
-        type: string
-        example: ES82 7139 7713 11 8283827121
-        description: IBAN de la cuenta
-      nombreBanco:
-        type: string
-        example: BBVA
-        description: Nombre del banco de la cuenta
-      direccionBanco:
-        type: string
-        example: 'Avda. Ripolles, 55'
-        description: Dirección de la sucursal en la que está abierta la cuenta
-    description: Datos relativos a una cuenta bancaria
-  FrecuenciaPago:
-    properties:
-      id:
-        type: string
-        example: ANUAL
-        description: Identificador de la frecuencia de pago
-        enum:
-          - ANUAL
-          - MENSUAL
-          - APLAZADO
-          - BIMESTRAL
-          - TRIMESTRAL
-          - CUATRIMESTRAL
-          - SEMESTRAL
-      nombre:
-        type: string
-        example: Frecuencia de pago anual
-        description: Descripción de la frecuencia de pago
-    description: Agrupa los datos de las frecuencias de pago disponibles
-  ImporteRecibo:
-    properties:
-      importeTotalRecibo:
-        type: number
-        format: float
-        example: 99.62
-        description: Importe total del recibo
-      primaNeta:
-        type: number
-        format: float
-        example: 83.61
-        description: Prima neta
-      descuento:
-        type: number
-        format: float
-        example: 0
-        description: Descuento aplicado
-      consorcio:
-        type: number
-        format: float
-        example: 8.32
-        description: Consorcio de Compensación de Seguros
-      ips:
-        type: number
-        format: float
-        example: 5.2
-        description: Impuestos sobre Primas de Seguros
-      lea:
-        type: number
-        format: float
-        example: 0.38
-        description: Liquidación Entidades Aseguradoras
-      arbitrio:
-        type: number
-        format: float
-        example: 2.11
-        description: Arbitrio de bomberos
-      gastosFraccionamiento:
-        type: number
-        format: float
-        example: 1.06
-        description: Gastos derivados del fraccionamiento del pago
-    description: Agrupa los datos relativos a un importe.
-  DatosBasicosRecibo:
-    properties:
-      id:
-        type: string
-        example: '054'
-        description: Identificador del recibo
-      fechaEfecto:
-        type: string
-        format: date
-        example: '2019-03-30'
-        description: Fecha de efecto del recibo
-      fraccion:
-        type: string
-        example: 1/3
-        description: Fracción del recibo
-      detalleImporte:
-        description: Detalle del importe del recibo
-        $ref: '#/definitions/ImporteRecibo'
-      situacionReciboAFecha:
-        type: string
-        example: Pagado
-        description: >-
-          Situacion del recibo a la fecha de consulta: pendiente, pagado,
-          impagado o anulado
-        enum:
-          - PENDIENTE
-          - PAGADO
-          - IMPAGADO
-          - ANULADO
-    description: Agrupa los datos relativos a un recibo.
-  Item:
-    properties:
-      id:
-        type: string
-        example: '25'
-        description: Identificador de la entidad
-      descripcion:
-        type: string
-        example: Recurso
-        description: Descripción de la entidad
-      url:
-        type: string
-        example: '/recursos/{id-recurso}'
-        description: URL para acceder al detalle de la entidad
-    description: Agrupa los datos relativos a una entidad.
-  Documento:
-    properties:
-      id:
-        type: string
-        example: '25'
-        description: Identificador del documento
-      urlDescarga:
-        type: string
-        example: 'https://aplicaciones.mutua.es/documentos/25'
-        description: Dirección URL para la descarga del documento
-    description: Contiene la información necesaria para acceder a un documento
-  Mensajes:
-    properties:
-      mensaje:
+    expand:
+      name: expand
+      in: query
+      description: Filter for ticket response body. (You must add 'attachment' query
+        param to get ticket attachments in response body)
+      required: false
+      style: form
+      explode: true
+      schema:
         type: array
-        description: Lista de mensajes al consumidor de la API
         items:
-          $ref: '#/definitions/DatosMensaje'
-    description: Objeto que permite agrupar los datos relativos a los mensajes.
-  DatosMensaje:
-    properties:
-      campo:
+          type: string
+          enum:
+          - attachment
+    fieldName:
+      name: fieldName
+      in: path
+      description: The field name in MasMovil ticketing API.
+      required: true
+      style: simple
+      explode: false
+      schema:
         type: string
-        example: id-poliza
-        description: >-
-          Nombre del campo sobre el que se informa: del error producido en el
-          caso de mensaje de error, del objeto actualizado/eliminado/creado en
-          caso de actualización/eliminación/creación
-      codigo:
-        type: string
-        example: ''
-        description: Codigo descriptivo del mensaje al consumidor de la API
-      descripcion:
-        type: string
-        example: ''
-        description: Descripción del mensaje para el consumidor de la API
-      ampliacionInformacion:
-        type: string
-        example: ''
-        description: >-
-          Detalle ampliado sobre el mensaje al consumidor. En el caso de fallo
-          en la creación de un objeto, informa sobre el detalle de este fallo.
-          En el caso de éxito de creación de un objeto, contiene un json con el
-          id del objeto creado y el path relativo /entidad/{id-entidad}.
-    description: Objeto que permite agrupar los datos de mensaje.
-  MovimientoRecibo:
-    properties:
-      idMovimiento:
-        type: string
-        example: '15'
-        description: Identificador del movimiento del recibo
-      fechaMovimiento:
-        type: string
-        format: date
-        example: '2019-06-10'
-        description: Fecha del movimiento
-      descripcionMovimiento:
-        type: string
-        example: RECIBO EMITIDO
-        description: 'Descripcion del movimiento: recibo emitido, enviado por el banco...'
-      fechaSituacionRecibo:
-        type: string
-        format: date
-        example: '2019-04-30'
-        description: Fecha de efecto del cambio de situacion
-    description: Agrupa los datos relativos al movimiento de un recibo
-x-ibm-configuration:
-  testable: true
-  enforced: true
-  cors:
-    enabled: true
-  assembly:
-    execute:
-      - proxy:
-          title: proxy
-          timeout: 60
-          verb: keep
-          cache-response: protocol
-          cache-ttl: 900
-          version: 1.0.0
-          target-url: $(target-url)$(request.path)
-  categories:
-    - / CROSS / Recibo
-    - / CROSS / DatosCobro
-    - / CROSS / DatosBasicosCobro
-    - / CROSS / CuentaBancaria
-    - / CROSS / FrecuenciaPago
-    - / CROSS / ImporteRecibo
-    - / CROSS / DatosBasicosRecibo
-    - / CROSS / Item
-    - / CROSS / Documento
-    - / CROSS / Mensajes
-    - / CROSS / DatosMensaje
-    - / CROSS / MovimientoRecibo
-  properties:
-    target-url:
-      value: 'http://scs-ws-proxy-apparq-uat.cloudpre.mutua.es/wsproxy'
-      description: URL del Mock Server
-      encoded: false
-  gateway: datapower-gateway
+        example: customerSegment
+    projectKey:
+      name: projectKey
+      in: query
+      description: The project key in MasMovil ticketing tool
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - MAS
+    ticketType:
+      name: ticketType
+      in: query
+      description: The ticket type in MasMovil ticketing tool
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - Avería (FTTH)
+          - Avería Cliente
+          - Incidencia
+          - Reclamación Instalación
+          - Cancelación Cliente
+  examples:
+    NetworkIncident:
+      value:
+        project: IDR
+        summary: Ticket summary
+        description: This is a ticket description example
+        ticketType: Incidencia Red
+        createdDate: 2019-08-20T10:29:29.908+1100
+        massive: "NO"
+        criticality: N1-Crítica o de corte
+        unavailability: SI
+        affectedNetworkElement: Network Element
+        affectedNetworkType: Voz-Red Mercurio
+        affectedBusiness: Empresas
+        eventStartDate: 2019-08-19T10:29:29.908+1100
+        title: test
+    FTTHFault:
+      value:
+        project: MAS
+        summary: Ticket summary
+        description: This is a ticket description example
+        ticketType: Avería (FTTH)
+        createdDate: 2019-08-20T10:29:29.908+1100
+        queue: SAC 1er Nivel
+    UpdateStatus:
+      value:
+        transitionId: 11
+    UpdatePriority:
+      value:
+        priority: High
+    UpdateGroup:
+      value:
+        assignedGroup: NOC-HD-FIJO
+    Attachment:
+      value:
+        name: image_example.jpg
+        data: R0lGODdhAQABAPAAAP8AAAAAACwAAAAAAQABAAACAkQBADs
+    Comment:
+      value:
+        body: This is a comment example
+    SearchExample:
+      value:
+        filters:
+          project: MAS
+          customerDocument:
+            $like: 50744198B
+        startAt: 0
+        maxResults: 10
+        fields:
+        - key
+        - summary
+        - issuetype
+        - status
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
