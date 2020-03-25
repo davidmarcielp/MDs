@@ -14,7 +14,7 @@ basePath: /cross-recibos/api/v1
 tags:
   - name: Recibos2
     description: >-
-      Agrupa la funcionalidad relacionada a la operativa de recibos asociados a
+      Agrupa la funcionalidad relacionada a la operativa de recibos bsociados a
       pólizas
   - name: Documentación
     description: >-
