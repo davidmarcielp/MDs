@@ -1,0 +1,450 @@
+pipeline {
+    agent any
+    stages {
+        /*stage('Get repo') {
+            steps {
+                echo 'Get repo'
+                git branch: 'master',
+                    credentialsId: 'id_rsa',
+                    url: 'git@github.com:davidmarcielp/MDs.git'
+            }
+        }*/
+
+        stage('Clear repo') {
+            steps {
+                script {
+                    sh '''#!/bin/bash
+                        #rm -rf *
+                        #rm -rf .git
+                        
+                        rm -rf "ourProject"
+                        mkdir ourProject
+                        cd ourProject
+                    '''
+                }
+            }
+        }
+        
+        stage('Get repo') {
+            steps {
+                script {
+                    sh '''#!/bin/bash
+                    
+                        cd ourProject
+                        git init
+                        
+                        git remote add origin https://demoUserJenkins2:PasswordDemoUserJenkins2@github.com/davidmarcielp/MDs.git
+                        git config --global user.email "davidmarcielp+demoUserJenkins2@gmail.com"
+                        git config --global user.name  "davidmarcielp+demoUserJenkins2@gmail.com"
+                        
+                        git fetch
+                        git checkout documentation
+                        git pull
+                    '''
+                }
+            }
+        }
+        
+        stage('Get .yml s') {
+            steps {
+                
+                sh '''#!/bin/bash
+                
+                    cd ourProject
+                    #init folder
+                    rm -rfv files
+                    mkdir files
+                    
+                    rm -rfv workspace
+                    mkdir workspace
+                    
+                    #git log --stat -n 1
+                    
+                    #copy .yml s to folder
+                    #we get the last commit files
+                    #we filter only the onew with the desired format
+                    #we iterate them
+                    git log --stat -n 1 | grep *doc/swagger.yml* | while read line; do
+                    
+                        line="${line%% |*}"
+                    
+                        echo "Copying '$line' to files"
+                        
+                        echo $line
+                        name=${line////_}
+                        
+                        
+                        name="$(echo -e "${name}" | tr -d '[:space:]')"
+                        line="$(echo -e "${line}" | tr -d '[:space:]')"
+                        
+                        version=$(cat ${line} | grep  -m 1 -h version | head -1 )
+                        version="$(echo -e "${version}" | tr -d '[:space:]')"
+                        version=${version#"version:"}
+                        #echo ${version}
+                        
+                        name="${version}__${name}"
+                        
+                        echo $name
+                        
+                        cp -- "$line" files/$name
+                        
+                    done
+                    '''
+            }
+        }
+        
+        stage('Creating Docker container') {
+            steps{
+                echo 'Creating Widdershins container if it hasnt been created yet'
+                script {
+                    sh '''#!/bin/bash
+                    [ ! "$(docker ps -a | grep converterDocker)" ] && docker create -t --name converterDocker widdershins .
+                    '''
+                }
+            }
+        }
+        stage('Copying API files to the docker container') {
+            steps{
+                script {
+                    sh '''#!/bin/bash
+                        cd ourProject
+                        echo "files:"
+                        ls files
+                        cd files
+                        docker cp ./ converterDocker:'/files'
+                        cd ..
+                        '''
+                }
+            }    
+        }
+
+        stage('Transformation into Markdown') {
+            steps {
+                echo 'Calling docker image to transform the APIs into Markdown'
+                script {
+                    sh '''#!/bin/bash
+                        docker start converterDocker
+                        
+                        RUNNING="test"
+                        while [ ! $RUNNING == "exited" ]
+                        do
+                            echo "Waiting for the converter to finish, current status: $RUNNING"
+                            RUNNING=$(docker inspect --format="{{.State.Status}}" converterDocker)
+                        done
+                        '''
+                    }   
+                      
+                }
+                
+        }
+            
+        stage('Extract results from docker') {
+            steps {
+                sh '''#!/bin/bash
+                
+                cd ourProject
+                
+                docker cp converterDocker:'/workspace/' ./
+                
+                echo "workspace:"
+                ls workspace
+                echo "end workspace"
+                
+                docker logs converterDocker
+                
+                docker rm converterDocker
+                '''
+            }
+        }
+    
+        stage('create folders') {
+            steps {
+                
+                sh '''#!/bin/bash
+                    cd ourProject
+                    
+                    #rm -rf PUBLISH
+                    #rm -rf DRAFT
+                    #rm -rf MDs
+                    #cp MDs/doc_swagger/1.md PUBLISH/doc_swagger/1.md
+                    #cp MDs/doc_swagger/1.md workspace/1.md
+                    
+                    #cp files/* workspace/
+                    
+                    echo "create folders"
+                
+                    MDS_FOLDER="MDs/"
+                    if [ ! -d "$MDS_FOLDER" ]; then
+                        mkdir $MDS_FOLDER
+                    fi
+                    DRAFT_FOLDER="DRAFT/"
+                    if [ ! -d "$DRAFT_FOLDER" ]; then
+                        mkdir $DRAFT_FOLDER
+                    fi
+                    PUBLISH_FOLDER="PUBLISH/"
+                    if [ ! -d "$PUBLISH_FOLDER" ]; then
+                        mkdir $PUBLISH_FOLDER
+                    fi
+                    '''
+            }
+        }
+        
+        stage('create subfolders and MDs') {
+            steps {
+                
+                sh '''#!/bin/bash
+                    cd ourProject
+                    
+                    #cp MDs/carpeta1_doc_swagger/1.md workspace/1.md
+                    #rm -rf DRAFT/*
+                
+                    echo "create subfolders"
+                    
+                    ls workspace | while read line; do
+                    
+                        #subfolder="$(basename -- "$line" .md)"
+                        header="$(basename -- "$line" .md)"
+                        name="${header#*__}"
+                        version="${header%__*}"
+                        
+                        version1="${version%%.*}"
+                        #echo $version1
+                        version2="${version#*.}"
+                        version2="${version2%.*}"
+                        #echo $version2
+                        version3="${version##*.}"
+                        #echo $version3
+                        
+                        echo hola1
+                        
+                        if [ ! -d "MDs/$name" ]; then
+                            mkdir MDs/$name
+                        fi
+                        
+                        if [ ! -d "DRAFT/$name" ]; then
+                        
+                            mkdir DRAFT/$name
+                            
+                            #create the _index.md file (required by hugo) for the endpoint
+                            title=$(cat workspace/$line | grep -m 1 -h "title: " | head -1)
+                            cd "DRAFT/${name}"
+                            
+                            echo """---
+"$title"
+description: ""
+draft: false
+weight: 1
+collapsible: true
+---""" > _index.md
+
+                            echo "p1"
+                            
+                            cd ../..
+                        fi
+                        
+                        if [ ! -d "PUBLISH/$name" ]; then
+                            mkdir PUBLISH/$name
+                        fi
+                        
+                    done
+                '''
+            }
+            
+        }
+
+
+
+        stage('create version folders and copy the file in MDs and Draft') {
+            steps {
+                
+                sh '''#!/bin/bash
+                    cd ourProject
+                    
+                    #create version folders
+                    ls workspace | while read line; do
+                    
+                        header="$(basename -- "$line" .md)"
+                        name="${header#*__}"
+                        version="${header%__*}"
+                        
+                        version1="${version%%.*}"
+                        version2="${version#*.}"
+                        version2="${version2%.*}"
+                        version3="${version##*.}"
+                        
+                        
+                        #create folder of the version in MDs
+                        if [ ! -d "MDs/${name}/${version1}" ]; then
+                            
+                            cd "MDs/${name}"
+                            mkdir ${version1}
+                            cd ../..
+                        fi
+                        
+                        #create folder of the version in DRAFT
+                        if [ ! -d "DRAFT/${name}/${version1}" ]; then
+                            
+                            #create folder of the version in DRAFT
+                            cd "DRAFT/${name}"
+                            mkdir ${version1}
+                            
+                            #create the _index.md (required by hugo) file for the version
+                            cd ${version1}
+                            
+                            echo """---
+title: "V${version1}"
+description: ""
+draft: false
+weight: $(( 100 - version2))
+collapsible: true
+---""" > _index.md
+                            cd ../../..
+                        fi
+
+
+                        #copy file to MDs
+                        cp workspace/$line MDs/${name}/${version1}/${line}
+                        
+                        #copy file to draft
+                        cp workspace/$line DRAFT/${name}/${version1}/${line}
+                        
+                    done
+                '''
+            }
+        }
+
+
+        stage('Enrich Draft') {
+            steps {
+                
+                sh '''#!/bin/bash
+                    cd ourProject
+                    
+                    #create version folders
+                    ls workspace | while read line; do
+                    
+                        header="$(basename -- "$line" .md)"
+                        name="${header#*__}"
+                        version="${header%__*}"
+                        
+                        version1="${version%%.*}"
+                        version2="${version#*.}"
+                        version2="${version2%.*}"
+                        version3="${version##*.}"
+                        
+                        
+                    #enrich draft
+                        
+                        if [ -n "$(ls -A "PUBLISH/${name}/${version1}/" 2>/dev/null)" ]; then
+                        #if [ -d "PUBLISH/${name}/${version1}/" ]; then
+                        
+                        
+                            #get Higher mid version value
+                            maxVersion2Infolder=$( ls --hide='_index.md' PUBLISH/${name}/${version1}/ | sort -nr -t . -k 2 | head -n1)
+                            maxVersion2Infolder="$(basename -- "$maxVersion2Infolder" .md)"
+                            maxVersion2Infolder="${maxVersion2Infolder%__*}"
+                            maxVersion2Infolder="${maxVersion2Infolder#*.}"
+                            maxVersion2Infolder="${maxVersion2Infolder%.*}"
+                            
+                            echo "maxVersion2Infolder $maxVersion2Infolder"
+                            
+                            #get Higher version file in folder
+                            highestVersionInFolder=$(ls PUBLISH/${name}/${version1}/${version1}.${maxVersion2Infolder}.*  | sort -nr -t . -k 3  | head -n1)
+                            highestVersionInFolderName="$(basename -- "$highestVersionInFolder")"
+                            
+                            echo "highestVersionInFolder $highestVersionInFolder"
+                            echo "highestVersionInFolderName $highestVersionInFolderName"
+                            
+                            
+                            #merge file with enriched file
+                            git merge-file \
+                                DRAFT/${name}/${version1}/${line} \
+                                MDs/${name}/${version1}/${highestVersionInFolderName} \
+                                PUBLISH/${name}/${version1}/${highestVersionInFolderName}
+                            
+                        fi
+                    done
+                '''
+            }
+        }
+        
+        /*stage('create DRAFTS') {
+            steps {
+                
+                sh '''#!/bin/bash
+                    cd ourProject
+                
+                    echo "create subfolders"
+                    
+                    ls workspace | while read line; do
+                    
+                        subfolder="$(basename -- "$line" .md)"
+                        
+                        lastVersion=$(ls --hide='_index.md' PUBLISH/${subfolder} | sort -nr -t . -k 1 | head -n1)
+                        lastVersion="$(basename -- "$lastVersion" .md)"
+                        
+                        newVersion=$((lastVersion+1))
+                        
+                        mv workspace/$line DRAFT/${subfolder}/${newVersion}.md
+                        
+                        echo "\"$lastVersion\""
+                        
+                        if [ -z "$lastVersion" ]
+                        then
+                            echo "\$var is empty"
+                        else
+                          
+                            echo "merge with:"
+                            echo " DRAFT/${subfolder}/${newVersion}.md"
+                            echo " MDs/${subfolder}/${lastVersion}.md"
+                            echo " PUBLISH/${subfolder}/${lastVersion}.md"
+                            
+                            git merge-file DRAFT/${subfolder}/${newVersion}.md MDs/${subfolder}/${lastVersion}.md PUBLISH/${subfolder}/${lastVersion}.md
+                            
+                            echo " after merge, dont delete this line or you will get an error "
+                            
+                            #git diff --no-index \
+                            #    PUBLISH/${subfolder}/${lastVersion}.md \
+                            #    MDs/${subfolder}/${lastVersion}.md > change.patch
+                        
+                            #patch -b DRAFT/${subfolder}/${newVersion}.md change.patch
+                         
+                            #git merge-file DRAFT/${subfolder}/${newVersion}.md  MDs/${subfolder}/${lastVersion}.md PUBLISH/${subfolder}/${lastVersion}.md
+                        fi
+                        
+                        
+                        
+                    done
+                '''
+            }
+        }*/
+        
+        stage('clear') {
+            steps {
+                
+                sh '''#!/bin/bash
+                
+                    cd ourProject
+                
+                    rm -rf files workspace
+                
+                    '''
+            }
+        }
+        
+        stage('push to git') {
+            steps {
+                
+                sh '''#!/bin/bash
+                
+                    cd ourProject
+                
+                    git add -A
+                    git commit -m "HUGO AUTOMATIC COMMIT"
+                    git push --set-upstream origin documentation
+                
+                    '''
+            }
+        }
+    }
+}
