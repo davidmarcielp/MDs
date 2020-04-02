@@ -1,9 +1,9 @@
 swagger: '2.0'
 info:
   description: >-
-    CAMBIO 11! API que recoge todas las funcionalidades relativas a los recibos gestionados
+    CAMBIO 121! API que recoge todas las funcionalidades relativas a los recibos gestionados
     por la Mutua  Madrileña en su distintos.
-  version: 1.1.1
+  version: 1.2.1
   title: CROSS - RECIBOS
   contact:
     name: Javier Moreno Lozano
