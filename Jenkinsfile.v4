@@ -37,6 +37,7 @@ pipeline {
                         git config --global user.email "davidmarcielp+demoUserJenkins2@gmail.com"
                         git config --global user.name  "davidmarcielp+demoUserJenkins2@gmail.com"
                         
+                        #move to the branch of work (documentation)
                         git fetch
                         git checkout documentation
                         git pull
@@ -49,16 +50,13 @@ pipeline {
             steps {
                 
                 sh '''#!/bin/bash
-                
                     cd ourProject
-                    #init folder
+                    
+                    #init working folders
                     rm -rfv files
                     mkdir files
-                    
                     rm -rfv workspace
                     mkdir workspace
-                    
-                    #git log --stat -n 1
                     
                     #copy .yml s to folder
                     #we get the last commit files
@@ -70,20 +68,18 @@ pipeline {
                     
                         echo "Copying '$line' to files"
                         
-                        echo $line
+                        #replace / with _
+                        #remove spaces and set the name as ver.si.on__url_to_file then
+                        #copy it to files folder to use it in future steps
+                        
                         name=${line////_}
-                        
-                        
                         name="$(echo -e "${name}" | tr -d '[:space:]')"
                         line="$(echo -e "${line}" | tr -d '[:space:]')"
-                        
                         version=$(cat ${line} | grep  -m 1 -h version | head -1 )
                         version="$(echo -e "${version}" | tr -d '[:space:]')"
                         version=${version#"version:"}
-                        #echo ${version}
                         
                         name="${version}__${name}"
-                        
                         echo $name
                         
                         cp -- "$line" files/$name
@@ -157,22 +153,12 @@ pipeline {
             }
         }
     
-        stage('create folders') {
+        stage('create parent folders') {
             steps {
                 
                 sh '''#!/bin/bash
                     cd ourProject
                     
-                    #rm -rf PUBLISH
-                    #rm -rf DRAFT
-                    #rm -rf MDs
-                    #cp MDs/doc_swagger/1.md PUBLISH/doc_swagger/1.md
-                    #cp MDs/doc_swagger/1.md workspace/1.md
-                    
-                    #cp files/* workspace/
-                    
-                    echo "create folders"
-                
                     MDS_FOLDER="MDs/"
                     if [ ! -d "$MDS_FOLDER" ]; then
                         mkdir $MDS_FOLDER
@@ -195,25 +181,16 @@ pipeline {
                 sh '''#!/bin/bash
                     cd ourProject
                     
-                    #cp MDs/carpeta1_doc_swagger/1.md workspace/1.md
-                    #rm -rf DRAFT/*
-                
-                    echo "create subfolders"
-                    
                     ls workspace | while read line; do
                     
-                        #subfolder="$(basename -- "$line" .md)"
+                        #extract information from name
                         header="$(basename -- "$line" .md)"
                         name="${header#*__}"
                         version="${header%__*}"
-                        
                         version1="${version%%.*}"
-                        #echo $version1
                         version2="${version#*.}"
                         version2="${version2%.*}"
-                        #echo $version2
                         version3="${version##*.}"
-                        #echo $version3
                         
                         echo hola1
                         
@@ -236,9 +213,6 @@ draft: false
 weight: 1
 collapsible: true
 ---""" > _index.md
-
-                            echo "p1"
-                            
                             cd ../..
                         fi
                         
@@ -263,10 +237,10 @@ collapsible: true
                     #create version folders
                     ls workspace | while read line; do
                     
+                        #extract information from name
                         header="$(basename -- "$line" .md)"
                         name="${header#*__}"
                         version="${header%__*}"
-                        
                         version1="${version%%.*}"
                         version2="${version#*.}"
                         version2="${version2%.*}"
@@ -320,24 +294,22 @@ collapsible: true
                 sh '''#!/bin/bash
                     cd ourProject
                     
-                    #create version folders
                     ls workspace | while read line; do
                     
+                        #extract information from name
                         header="$(basename -- "$line" .md)"
                         name="${header#*__}"
                         version="${header%__*}"
-                        
                         version1="${version%%.*}"
                         version2="${version#*.}"
                         version2="${version2%.*}"
                         version3="${version##*.}"
                         
                         
-                    #enrich draft
+                    #enrich draft version based in previous Publish version
                         
                         if [ -n "$(ls -A "PUBLISH/${name}/${version1}/" 2>/dev/null)" ]; then
                         #if [ -d "PUBLISH/${name}/${version1}/" ]; then
-                        
                         
                             #get Higher mid version value
                             maxVersion2Infolder=$( ls --hide='_index.md' PUBLISH/${name}/${version1}/ | sort -nr -t . -k 2 | head -n1)
@@ -346,15 +318,14 @@ collapsible: true
                             maxVersion2Infolder="${maxVersion2Infolder#*.}"
                             maxVersion2Infolder="${maxVersion2Infolder%.*}"
                             
-                            echo "maxVersion2Infolder $maxVersion2Infolder"
+                            #echo "maxVersion2Infolder $maxVersion2Infolder"
                             
                             #get Higher version file in folder
                             highestVersionInFolder=$(ls PUBLISH/${name}/${version1}/${version1}.${maxVersion2Infolder}.*  | sort -nr -t . -k 3  | head -n1)
                             highestVersionInFolderName="$(basename -- "$highestVersionInFolder")"
                             
                             echo "highestVersionInFolder $highestVersionInFolder"
-                            echo "highestVersionInFolderName $highestVersionInFolderName"
-                            
+                            #echo "highestVersionInFolderName $highestVersionInFolderName"
                             
                             #merge file with enriched file
                             git merge-file \
@@ -367,57 +338,6 @@ collapsible: true
                 '''
             }
         }
-        
-        /*stage('create DRAFTS') {
-            steps {
-                
-                sh '''#!/bin/bash
-                    cd ourProject
-                
-                    echo "create subfolders"
-                    
-                    ls workspace | while read line; do
-                    
-                        subfolder="$(basename -- "$line" .md)"
-                        
-                        lastVersion=$(ls --hide='_index.md' PUBLISH/${subfolder} | sort -nr -t . -k 1 | head -n1)
-                        lastVersion="$(basename -- "$lastVersion" .md)"
-                        
-                        newVersion=$((lastVersion+1))
-                        
-                        mv workspace/$line DRAFT/${subfolder}/${newVersion}.md
-                        
-                        echo "\"$lastVersion\""
-                        
-                        if [ -z "$lastVersion" ]
-                        then
-                            echo "\$var is empty"
-                        else
-                          
-                            echo "merge with:"
-                            echo " DRAFT/${subfolder}/${newVersion}.md"
-                            echo " MDs/${subfolder}/${lastVersion}.md"
-                            echo " PUBLISH/${subfolder}/${lastVersion}.md"
-                            
-                            git merge-file DRAFT/${subfolder}/${newVersion}.md MDs/${subfolder}/${lastVersion}.md PUBLISH/${subfolder}/${lastVersion}.md
-                            
-                            echo " after merge, dont delete this line or you will get an error "
-                            
-                            #git diff --no-index \
-                            #    PUBLISH/${subfolder}/${lastVersion}.md \
-                            #    MDs/${subfolder}/${lastVersion}.md > change.patch
-                        
-                            #patch -b DRAFT/${subfolder}/${newVersion}.md change.patch
-                         
-                            #git merge-file DRAFT/${subfolder}/${newVersion}.md  MDs/${subfolder}/${lastVersion}.md PUBLISH/${subfolder}/${lastVersion}.md
-                        fi
-                        
-                        
-                        
-                    done
-                '''
-            }
-        }*/
         
         stage('clear') {
             steps {
@@ -439,6 +359,7 @@ collapsible: true
                 
                     cd ourProject
                 
+                    #push to documentation branch
                     git add -A
                     git commit -m "HUGO AUTOMATIC COMMIT"
                     git push --set-upstream origin documentation
