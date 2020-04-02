@@ -4,7 +4,7 @@ info:
   description: This is the ao ticketing -  api server.
   contact:
     email: ticketing_squad@masmovil.com
-  version: 1.1.1
+  version: 2.2.2
 servers:
 - url: '{protocol}://{environment}'
   variables:
