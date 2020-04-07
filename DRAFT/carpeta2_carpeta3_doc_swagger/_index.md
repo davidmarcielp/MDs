@@ -1,5 +1,5 @@
 ---
-title: CROSS - RECIBOS
+title: >-
 description: 
 draft: false
 weight: 1
