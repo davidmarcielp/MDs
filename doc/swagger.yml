@@ -9,7 +9,7 @@ info:
     /oauth/token | Basic <base64(client_id:client_secret)>
   contact:
     email: authn@masmovil.com
-  version: 1.4.1
+  version: 1.4.0
 servers:
 - url: http://localhost:8080
 - url: http://localhost:8081
