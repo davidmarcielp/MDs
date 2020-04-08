@@ -9,13 +9,13 @@ info:
     /oauth/token | Basic <base64(client_id:client_secret)>
   contact:
     email: authn@masmovil.com
-  version: 1.4.0
+  version: 1.4.1
 servers:
 - url: http://localhost:8080
 - url: http://localhost:8081
 tags:
 - name: Applications
-  description: API for managing applications
+  description: API for managing applications api nueva
 - name: Clients
   description: API for managing OAuth2 clients and associate them to applications.
 - name: Administration
