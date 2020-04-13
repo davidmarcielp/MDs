@@ -2,7 +2,7 @@ swagger: '2.0'
 info:
   description: >-
     CAMBIO 4  API que recoge todas las funcionalidades relativas a los recibos gestionados
-    por la Mutua Madrileña Muy Madrileña en su distintos.   
+    por la Mutua Madrileña Muy Madrileña en su distintos.  
   version: 1.3.3
   title: CROSS - RECIBOS
   contact:
