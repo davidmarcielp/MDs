@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Authn API
   description: |
-    This is the API for authn in MM  
+    This is the API for authn in MM 
     ## Security:
     Paths | Authorization header
     ----- |---------
