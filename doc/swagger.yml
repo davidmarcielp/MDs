@@ -5,7 +5,7 @@ info:
     This is the API for authn in MM
     ## Security:
     Paths | Authorization header 
-    ----- |---------
+    ----- |--------- 
     /oauth/token | Basic <base64(client_id:client_secret)>
   contact:
     email: authn@masmovil.com
