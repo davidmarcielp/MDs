@@ -1,0 +1,215 @@
+pipeline {
+    agent any
+    stages {
+        /*stage('Get repo') {
+            steps {
+                echo 'Get repo'
+                git branch: 'master',
+                    credentialsId: 'id_rsa',
+                    url: 'git@github.com:davidmarcielp/MDs.git'
+            }
+        }*/
+        stage('Clear repo') {
+            steps {
+                echo 'Clear repo'
+                
+                script {
+                    sh '''#!/bin/bash
+                        #rm -rf *
+                        #rm -rf .git
+                        
+                        rm -rf "ourProject"
+                        mkdir ourProject
+                        cd ourProject
+                    '''
+                }
+            }
+        }
+        
+        stage('Get repo') {
+            steps {
+                echo 'Get repo'
+                
+                script {
+                    sh '''#!/bin/bash
+                    
+                        cd ourProject
+                        git init
+                        
+                        git remote add origin https://demoUserJenkins2:PasswordDemoUserJenkins2@github.com/davidmarcielp/MDs.git
+                        git config --global user.email "davidmarcielp+demoUserJenkins2@gmail.com"
+                        git config --global user.name  "davidmarcielp+demoUserJenkins2@gmail.com"
+                        
+                        git checkout master
+                        git pull origin master
+                    '''
+                }
+            }
+        }
+        
+        stage('Get .yml s') {
+            steps {
+                echo 'Get .yml s'
+                
+                sh '''#!/bin/bash
+                
+                    cd ourProject
+                    #init folder
+                    rm -rfv files
+                    mkdir files
+                    
+                    rm -rfv workspace
+                    mkdir workspace
+                    
+                    #copy .yml s to folder
+                    #we get the last commit files
+                    #we filter only the onew with the desired format
+                    #we iterate them
+                    git log --stat -n 1 | grep *doc/swagger.yml* | while read line; do
+                    
+                        line="${line%% |*}"
+                    
+                        echo "Copying '$line' to files"
+                        
+                        echo $line
+                        name=${line////_}
+                        
+                        name="$(echo -e "${name}" | tr -d '[:space:]')"
+                        line="$(echo -e "${line}" | tr -d '[:space:]')"
+                        
+                        echo $name
+                        
+                        cp -- "$line" files/$name
+                        
+                    done
+                    '''
+            }
+        }
+        stage('Creating Docker container') {
+            steps{
+                echo 'Creating Widdershins container if it hasnt been created yet'
+                script {
+                    sh '''#!/bin/bash
+                    [ ! "$(docker ps -a | grep converterDocker)" ] && docker create -t --name converterDocker widdershins .
+                    '''
+                }
+            }
+        }
+        stage('Copying API files to the docker container') {
+            steps{
+                script {
+                    sh '''#!/bin/bash
+                        cd ourProject
+                        echo "files:"
+                        ls files
+                        cd files
+                        docker cp ./ converterDocker:'/files'
+                        cd ..
+                        '''
+                }
+            }    
+        }
+
+        stage('Transformation into Markdown') {
+            steps {
+                echo 'Calling docker image to transform the APIs into Markdown'
+                script {
+                    sh '''#!/bin/bash
+                        docker start converterDocker
+                        
+                        RUNNING="test"
+                        while [ ! $RUNNING == "exited" ]
+                        do
+                            echo "Waiting for the converter to finish, current status: $RUNNING"
+                            RUNNING=$(docker inspect --format="{{.State.Status}}" converterDocker)
+                        done
+                        '''
+                    }   
+                      
+                }
+                
+        }
+            
+        stage('Extract results from docker') {
+            steps {
+                echo 'Extract results from docker'
+                sh '''#!/bin/bash
+                
+                cd ourProject
+                
+                docker cp converterDocker:'/workspace/' ./
+                
+                echo "workspace:"
+                ls workspace
+                echo "end workspace"
+                
+                docker logs converterDocker
+                
+                docker rm converterDocker
+                '''
+            }
+        }
+    
+        stage('create folders') {
+            steps {
+                
+                sh '''#!/bin/bash
+                    cd ourProject
+                
+                    MDS_FOLDER="MDs/"
+                    if [ ! -d "$MDS_FOLDER" ]; then
+                        mkdir $MDS_FOLDER
+                    fi
+                    MDSP_FOLDER="MDs+/"
+                    if [ ! -d "$MDSP_FOLDER" ]; then
+                        mkdir $MDSP_FOLDER
+                    fi
+                    PUBLISH_FOLDER="PUBLISH/"
+                    if [ ! -d "$PUBLISH_FOLDER" ]; then
+                        mkdir $PUBLISH_FOLDER
+                    fi
+                    '''
+            }
+            
+        }
+        
+        stage('create subfolders') {
+            steps {
+                
+                sh '''#!/bin/bash
+                    cd ourProject
+                
+                    ls workspace | while read line; do
+                    
+                        subfolder="$(basename -- "$line" .md)"
+                    
+                        echo $subfolder
+                        mkdir MDs/$subfolder
+                        mkdir MDs+/$subfolder
+                        mkdir PUBLISH/$subfolder
+                    
+                        
+                    done
+                '''
+            }
+            
+        }
+        
+        /*stage('push to git') {
+            steps {
+                
+                sh '''#!/bin/bash
+                
+                #a >> prueba.txt
+                #git add prueba.txt
+                #git commit -m "Prueba"
+                
+                    git add -A
+                    git commit -m "HUGO AUTOMATIC COMMIT"
+                    git push origin master
+                
+                    '''
+            }
+        }*/
+    }
+}
