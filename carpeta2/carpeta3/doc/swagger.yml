@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  title: Cambio 7 sobre el swagger. MasMovil Ticketing API - Inbound (External Systems > MasMovil)0
+  title: Cambio 8 sobre el swagger. MasMovil Ticketing API - Inbound (External Systems > MasMovil)0
   description: This is the ao ticketing - api server. 
   contact:
     email: ticketing_squad@masmovil.com
