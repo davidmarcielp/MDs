@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   version: 1.0.0
-  title: Swagger Petstore Cambio 33
+  title: Swagger Petstore Cambio 34
   license:
     name: MIT
 host: petstore.swagger.io
