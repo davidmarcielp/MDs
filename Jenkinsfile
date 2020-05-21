@@ -220,45 +220,44 @@ pipeline {
     	            
                     //withEnv(["HEAD_COMMIT="+myAPIChanges.getHeadCommit()]) {
 
-    	            withCredentials([usernamePassword(credentialsId: '806bdc4e-af90-4255-83fc-b434c30a6720', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                        sh '''#!/bin/bash
-                            COMMIT_FILE=current_commit 
+                        withCredentials([usernamePassword(credentialsId: '806bdc4e-af90-4255-83fc-b434c30a6720', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                            sh '''#!/bin/bash
+                                COMMIT_FILE=current_commit 
 
-                            echo "commit file $COMMIT_FILE"
+                                echo "commit file $COMMIT_FILE"
 
-                            #touch missing_changes_file
-                            #git init
-                            #git remote set-url origin "https://${USERNAME}:${PASSWORD}@$UPLOAD"
-                            
-				            #git fetch origin $MAIN_BRANCH
-				            
-                            #if [[ ! -f "$COMMIT_FILE" ]]; then
-                            #    echo "There is no previous commit registered, take HEAD instead"
-                            #    git rev-parse HEAD > current_commit
-                            #fi
-                            
-                            #var_current_commit=$(cat current_commit)
-                            #echo "current commit $var_current_commit"
-                            #echo "head commit $HEAD_COMMIT"
-				            
-                            #git rev-list $var_current_commit..$HEAD_COMMIT > missing_commits_file
-				            
-                            #cat missing_commits_file | while read line; do
-				            #    echo "COMMIT : "+$line
-				            #    echo "-----------------------------------"
-				            #    git diff-tree --no-commit-id --name-only -r $line >> missing_changes_file
-				            #done
-				            
-                            #echo "Updating current commit with last commit fetched"
-                            
-                            #echo $HEAD_COMMIT > current_commit
-                            
-                        '''
-    	            }
+                                #touch missing_changes_file
+                                #git init
+                                #git remote set-url origin "https://${USERNAME}:${PASSWORD}@$UPLOAD"
+                                
+                                #git fetch origin $MAIN_BRANCH
+                                
+                                #if [[ ! -f "$COMMIT_FILE" ]]; then
+                                #    echo "There is no previous commit registered, take HEAD instead"
+                                #    git rev-parse HEAD > current_commit
+                                #fi
+                                
+                                #var_current_commit=$(cat current_commit)
+                                #echo "current commit $var_current_commit"
+                                #echo "head commit $HEAD_COMMIT"
+                                
+                                #git rev-list $var_current_commit..$HEAD_COMMIT > missing_commits_file
+                                
+                                #cat missing_commits_file | while read line; do
+                                #    echo "COMMIT : "+$line
+                                #    echo "-----------------------------------"
+                                #    git diff-tree --no-commit-id --name-only -r $line >> missing_changes_file
+                                #done
+                                
+                                #echo "Updating current commit with last commit fetched"
+                                
+                                #echo $HEAD_COMMIT > current_commit
+                                
+                            '''
+                        }
+                    //}
                 }
-                
-	        }
-        }
+            }
         }
     }
 }
