@@ -248,11 +248,11 @@ pipeline {
                     env.WORKSPACE = pwd()
                     echo "env.WORKSPACE " + env.WORKSPACE
 
-                    getHeadCommit = fileExists "${env.WORKSPACE}/hugo/head_commit"
+                    getHeadCommit = fileExists "${env.WORKSPACE}/head_commit"
                     echo "getHeadCommit " + getHeadCommit
 
                     if(getHeadCommit){                            
-                        headCommit = readFile "${env.WORKSPACE}/hugo/head_commit"
+                        headCommit = readFile "${env.WORKSPACE}/head_commit"
                         echo "headCommit " + headCommit
                         env.HEAD_COMMIT = headCommit
                     
