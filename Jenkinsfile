@@ -220,7 +220,7 @@ pipeline {
                                 
                                 var_current_commit=$(cat current_commit)
                                 echo "current commit $var_current_commit"
-                                HEAD_COMMIT=$(git log --format="%H" -n 10)
+                                HEAD_COMMIT=$(git log --format="%H" -n 1)
                                 echo "head commit $HEAD_COMMIT"
                                 
                                 git rev-list $var_current_commit..$HEAD_COMMIT > missing_commits_file
