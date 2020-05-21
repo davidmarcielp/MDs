@@ -16,9 +16,24 @@ class APIChanges {
                                         * true -> Indica que hay APIs modificadas en este Job
                                         * false -> (Por defecto), indica que en el job actual no existen APIs modificadas o anadidas
     */
-    
+    private String head_commit = "" // String que albergará el identificador del commit de cabecera
+
     def APIsRoutes = []; // Array de String que almacenará las rutas modificadas o anadidas
-     
+    
+    def getHeadCommit() {
+        /*
+        * Devuelve el identificador del commit de cabecera
+        */
+        return head_commit;
+    }
+    
+    def setHeadCommit(commitId) {
+        /*
+        * Establece el identificador del commit de cabecera
+        */
+        head_commit = commitId
+    }
+
     def getNumberAPIsAffected() {
         /*
         * Devuelve el número de APIs afectadas
@@ -124,9 +139,7 @@ class APIChanges {
         // Devuelve APIChanged, si existe al menos una API en este job el valor de este booleano sera true.
         return APIChanged
     }
-    
 }
-
 
 def compute_API_affected(current_commit)
 {
@@ -195,49 +208,59 @@ pipeline {
                     4.2 Si existia el fichero, se añade la informacion de las rutas al objeto myAPIChanges.
                     5. Si no existe información de rutas en myAPIChanges se imprime un mensaje indicando que no existen rutas afectadas en la ejecución de este Job.
                     */
-
-    	            //def payload = readJSON text: env.payload
-    	            //def head_commit = payload.head_commit
-                    //myAPIChanges =compute_API_affected(head_commit)
-                    
                     // La siguiente sentencia establece un bloque en el que el valor de HEAD COMMIT es modificado por el identificador almacenado
                     // Tambien se accede al script bash con las credenciales indicadas anteriormente
-    	            
-                    //withEnv(["HEAD_COMMIT="+myAPIChanges.getHeadCommit()]) {
+    	        
+                    withCredentials([usernamePassword(credentialsId: '806bdc4e-af90-4255-83fc-b434c30a6720', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh '''#!/bin/bash
+                            COMMIT_FILE=current_commit 
 
-                        withCredentials([usernamePassword(credentialsId: '806bdc4e-af90-4255-83fc-b434c30a6720', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                            sh '''#!/bin/bash
-                                COMMIT_FILE=current_commit 
+                            echo "commit file $COMMIT_FILE"
 
-                                echo "commit file $COMMIT_FILE"
+                            touch missing_changes_file
+                            
+                            if [[ ! -f "$COMMIT_FILE" ]]; then
+                                echo "There is no previous commit registered, take HEAD instead"
+                                git rev-parse HEAD > current_commit
+                            fi
+                            
+                            var_current_commit=$(cat current_commit)
+                            echo "current commit $var_current_commit"
+                            HEAD_COMMIT=$(git log --format="%H" -n 1)
+                            echo $HEAD_COMMIT > head_commit
+                            echo "head commit $HEAD_COMMIT"
+                            
+                            git rev-list $var_current_commit..$HEAD_COMMIT > missing_commits_file
+                            
+                            cat missing_commits_file | while read line; do
+                                echo "COMMIT : "+$line
+                                echo "-----------------------------------"
+                                git diff-tree --no-commit-id --name-only -r $line >> missing_changes_file
+                            done
+                            
+                            echo "Updating current commit with last commit fetched"
+                            
+                            echo $HEAD_COMMIT > current_commit
+                            
+                        '''
+                    }
 
-                                #touch missing_changes_file
-                                
-                                if [[ ! -f "$COMMIT_FILE" ]]; then
-                                    echo "There is no previous commit registered, take HEAD instead"
-                                    git rev-parse HEAD > current_commit
-                                fi
-                                
-                                var_current_commit=$(cat current_commit)
-                                echo "current commit $var_current_commit"
-                                HEAD_COMMIT=$(git log --format="%H" -n 1)
-                                echo "head commit $HEAD_COMMIT"
-                                
-                                git rev-list $var_current_commit..$HEAD_COMMIT > missing_commits_file
-                                
-                                cat missing_commits_file | while read line; do
-                                    echo "COMMIT : "+$line
-                                    echo "-----------------------------------"
-                                    git diff-tree --no-commit-id --name-only -r $line >> missing_changes_file
-                                done
-                                
-                                echo "Updating current commit with last commit fetched"
-                                
-                                echo $HEAD_COMMIT > current_commit
-                                
-                            '''
-                        }
-                    //}
+                    env.WORKSPACE = pwd()
+                    echo "env.WORKSPACE " + env.WORKSPACE
+
+                    getHeadCommit = fileExists "${env.WORKSPACE}/hugo/head_commit"
+                    echo "getHeadCommit " + getHeadCommit
+
+                    if(getHeadCommit){                            
+                        headCommit = readFile "${env.WORKSPACE}/hugo/head_commit"
+                        echo "headCommit " + headCommit
+                        env.HEAD_COMMIT = headCommit
+                    
+                        /*git url: REPOSITORY,
+                        credentialsId: CREDENTIALS,
+                        branch: BRANCH */
+                    }
+
                 }
             }
         }
