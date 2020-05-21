@@ -3,7 +3,9 @@ pipeline {
     
     stages {
         stage('Check weather we should create a new docker image or not.') {
-            echo "hello world"
+            script{
+                echo "hello world"
+            }
         }
     }
 }
