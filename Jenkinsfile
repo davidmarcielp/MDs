@@ -16,24 +16,9 @@ class APIChanges {
                                         * true -> Indica que hay APIs modificadas en este Job
                                         * false -> (Por defecto), indica que en el job actual no existen APIs modificadas o anadidas
     */
-    private String head_commit = "" // String que albergará el identificador del commit de cabecera
-
+    
     def APIsRoutes = []; // Array de String que almacenará las rutas modificadas o anadidas
-    
-    def getHeadCommit() {
-        /*
-        * Devuelve el identificador del commit de cabecera
-        */
-        return head_commit;
-    }
-    
-    def setHeadCommit(commitId) {
-        /*
-        * Establece el identificador del commit de cabecera
-        */
-        head_commit = commitId
-    }
-
+     
     def getNumberAPIsAffected() {
         /*
         * Devuelve el número de APIs afectadas
@@ -235,6 +220,7 @@ pipeline {
                                 
                                 var_current_commit=$(cat current_commit)
                                 echo "current commit $var_current_commit"
+                                HEAD_COMMIT=$(git log --format="%H" -n 1)
                                 echo "head commit $HEAD_COMMIT"
                                 
                                 git rev-list $var_current_commit..$HEAD_COMMIT > missing_commits_file
