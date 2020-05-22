@@ -288,7 +288,7 @@ pipeline {
             }
         }
         
-        stage('Push to Git') {
+        stage('Push to Git2') {
             steps {
                 script {
                                             /*
