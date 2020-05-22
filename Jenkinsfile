@@ -231,13 +231,18 @@ pipeline {
                             #    var_current_commit=$(cat current_commit)
                             #fi
 
+                            var_current_commit=$(cat current_commit)
+                            if [[ -z "$var_current_commit" ]]; then
+                                var_current_commit=$(git log --format="%H" -n 2)
+                            fi
+
                             echo "current commit $var_current_commit"
                             HEAD_COMMIT=$(git log --format="%H" -n 1)
                             echo $HEAD_COMMIT > head_commit
                             echo "head commit $HEAD_COMMIT"
                             
-                            #git rev-list $var_current_commit..$HEAD_COMMIT > missing_commits_file
-                            git rev-list $HEAD_COMMIT..$var_current_commit > missing_commits_file
+                            git rev-list $var_current_commit..$HEAD_COMMIT > missing_commits_file
+                            #git rev-list $HEAD_COMMIT..$var_current_commit > missing_commits_file
                             
                             cat missing_commits_file | while read line; do
                                 echo "COMMIT : "+$line
