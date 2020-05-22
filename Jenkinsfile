@@ -227,7 +227,7 @@ pipeline {
 
                             #if [[ "$COMMIT_FILE" == "current_commit" ]]; then
                             #    var_current_commit=$(git log --format="%H" -n 2)
-                            else
+                            #else
                             #    var_current_commit=$(cat current_commit)
                             #fi
 
