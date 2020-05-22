@@ -28,7 +28,7 @@ tags:
   - name: IAM
     description: Identity and Access Management API
   - name: Health-check
-    description: Operations  available to regular developers
+    description: Operations available to regular developers
   - name: Password
     description: Operations  related  to  credentials  management 
   - name: Users
