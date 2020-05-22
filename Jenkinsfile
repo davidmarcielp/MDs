@@ -256,10 +256,23 @@ pipeline {
                         echo "headCommit " + headCommit
                         env.HEAD_COMMIT = headCommit
                     
-                        git url: REPOSITORY,
+                        /*git url: REPOSITORY,
                             credentialsId: CREDENTIALS,
-                            branch: BRANCH
+                            branch: BRANCH*/
                     }
+
+                    // Turn the file into a valid array
+                    def missing_commits = readFile(file: 'missing_changes_file').split('\n')
+                    if(missing_commits.length > 0 ){
+                        if(missing_commits[0] != ""){
+                            myAPIChanges.setAPIsRoutes(missing_commits)
+                        }
+                    }
+
+    	            if(!myAPIChanges.isAPIChanged()) {
+    	                echo "There are no API definitions changed in this commit job"
+    	            }
+                    
 
                 }
             }
