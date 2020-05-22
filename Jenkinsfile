@@ -738,6 +738,8 @@ collapsible: true
                                 git config user.email "HUGO AUTOMATED SYSTEM"
                                 git config user.name  "HUGO AUTOMATED SYSTEM"
                                 
+                rm -rf DRAFT/en/docs/REAL_API_doc_swagger MDs/en/docs/REAL_API_doc_swagger
+
                                 #push to documentation branch
                                 git add -A
                                 git commit -m "HUGO AUTOMATIC COMMIT"
