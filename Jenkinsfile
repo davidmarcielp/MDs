@@ -247,7 +247,7 @@ pipeline {
 
                     env.WORKSPACE = pwd()
                     echo "env.WORKSPACE " + env.WORKSPACE
- 
+
                     getHeadCommit = fileExists "${env.WORKSPACE}/head_commit"
                     echo "getHeadCommit " + getHeadCommit
 
