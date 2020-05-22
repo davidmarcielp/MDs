@@ -341,6 +341,8 @@ pipeline {
                                 
                 rm -rf DRAFT/en/docs/REAL_API_doc_swagger MDs/en/docs/REAL_API_doc_swagger
 
+                git pull
+                
                                 #push to documentation branch
                                 git add -A
                                 git commit -m "HUGO AUTOMATIC COMMIT"
