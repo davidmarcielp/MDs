@@ -272,8 +272,482 @@ pipeline {
     	            if(!myAPIChanges.isAPIChanged()) {
     	                echo "There are no API definitions changed in this commit job"
     	            }
-                    
+                }
+            }
+        }
+    }
+    
+        stage('Initialize Repository Configuration') {
+            steps {
+                script {
+                        /*
+                        *   Descripcion: 
+                        *       Si y solo si hay APIs afectadas:
+                        *   1. Se inicializa a traves del plugin de GIT, el repositorio a través de la rama de documentation.
+                        ------- Script Bash
+                        *   2. Modificando a traves de la directiva withEnv el valor de la variable de entorno HEAD_COMMIT
+                        *   2.1 Se actualiza el valor del fichero current_commit, con el valor de la variable HEAD_COMMIT que contiene el identificador del ultimo commit comprobado.
+                        *   Nota: Este paso es necesario, puesto que al cambiar a la rama documentation se ha perdido el valor con respecto al paso anterior.
+                        */
+                        if(myAPIChanges.isAPIChanged()) {
+                            // Is neccesary to create BRANCH documentation previously in order to have this job runnging.
+                            git url: REPOSITORY,
+                                credentialsId: CREDENTIALS,
+                                branch: BRANCH
+                                                        
+        	                //After this, some files are rewritten by the plugin itself, update again the current commit file
+                            withEnv(["HEAD_COMMIT="+myAPIChanges.getHeadCommit()]) {
+                            
+                            sh '''#!/bin/bash
+                                echo "Updating current commit with last commit fetched"
+                                echo $HEAD_COMMIT > current_commit
+                                echo "Last commit after update:"
+                                cat current_commit
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Checking Last Commit Affected Files') {
+            steps {
+                script {
+                    /*
+                    * Descripcion:
+                    *   Si y solo si hay APIs afectadas:
+                    * ---------Script bash
+                    *  0. Se modifica mediante withEnv, el valor de la variable ROUTE_LIST, con el conjunto de rutas de ficheros a descargar
+                    *  1. Se inicializa las carpetas temporales de trabajo
+                    *  2. Se itera sobre ROUTE_LIST, y para cada ruta.
+                    *  2.1 Se hace un checkout de la ruta, desde la rama master a la rama documentacion
+                    *  2.2 Se obtiene la version, y se modifica el nombre del fichero que contiene la API
+                    *  2.3 Se copia la API a la carpeta temporal files/
+                    */
+                    if(myAPIChanges.isAPIChanged()){
+                        withEnv(["ROUTE_LIST="+myAPIChanges.getAPIsRoutesToString()]) {                                  
+                        sh '''#!/bin/bash
+                            #init working folders
+                            rm -rfv files
+                            mkdir files
+                            rm -rfv workspace
+                            mkdir workspace
+                            
+                            #copy .yaml s to folder
+                            #we get the last commit files
+                            #we filter only the onew with the desired format
+                            #we iterate them
+                            echo 'Print Routes....'
+                            echo "$ROUTE_LIST"
+                            echo "-----------------------------------"
+                            echo "$ROUTE_LIST" | while read line; do
+                            
+                                echo "line $line"
+                                git checkout origin/master -- "$line"
+                            
+                                echo "Copying line '$line' to files"
+                                
+                                #replace / with _
+                                #remove spaces and set the name as ver.si.on__url_to_file then
+                                #copy it to files folder to use it in future steps
+                                
+                                name=${line////_}
+                                name="$(echo -e "${name}" | tr -d '[:space:]')"
+                                version=$(cat "${line}" | grep  -m 1 -h version | head -1 )
+                                version="$(echo -e "${version}" | tr -d '[:space:]')"
+                                version=${version#"version:"}
+                                version1="${version%%.*}"
+                                
+                                name="${version}__${name}"
+                                echo "name $name"
+                                echo "version $version"
+                                echo "version1 $version1"
+                                
+                                #if the file contains a version
+                                #set the file at the right place to be treated
+                                if [[ $version1 =~ ^[0-9]+$ ]] ; then
+                                    echo "copy file $line"
+                                    cp -- "$line" files/$name
+                                fi
+                                
+                                #cp -- "$line" files/$name
 
+                                #remove the file of the checkout
+                                #TODO git doesnt take into account empty folders so it wont push the remainings
+                                #but this folder would persist in jenkins workspace
+                                #we could delete this folder (we should check it is not a folder we are using like DRAFT)
+                                rm -rf "$line"
+                                
+                                echo " "
+                            done
+
+                            echo "------"
+                            ls files
+                            '''
+                        }
+                    }
+                }
+            }   
+        }
+        
+
+        stage('Transformation into Markdown') {
+            steps {
+                echo 'Calling docker image to transform the APIs into Markdown'
+                script {
+                                        /*
+                    * Descripcion:
+                    *   Si y solo si hay APIs afectadas:
+                    * ---------Script bash
+                    *  1. Se itera para cada fichero que hay en files
+                    *  1.1 Se llama a Widdershins para que transforme la API a Markdown, y se almacena en workspace
+                    *  2.1 Se hace un checkout de la ruta, desde la rama master a la rama documentacion
+                    * TODO : Hay una comprobacion de que existan ficheros en files/, en este caso si se ha llegado a este step es porque deberia haber APIs en ese directorio
+                    * TODO: Existe tambien una comprobacion de diferentes extensiones (json / yaml / yml) que ya se ha realizado previamente.
+                    */
+                    if(myAPIChanges.isAPIChanged()){
+                        
+                        sh '''#!/bin/bash
+                        
+                        FILES=files/*
+                        echo "<$FILES>"
+                        
+                        ls -lrt files
+                        
+                        for f in $FILES
+                        do
+                        
+                            echo "f: $f"
+                        
+                            if [[ "$f" == "files/*" ]]; then
+                        
+                                echo "there are no files"
+                        
+                            else
+                        
+                                echo "there are file $f"
+                        
+                                if  [[ $f == *.json ]] ; then
+                                    filename="$(basename -- "$f" .json)"
+                                    filename="$filename.md"
+
+                                    widdershins --language_tabs 'java:Java' 'go:Go' 'javascript:JavaScript' -o workspace/$filename $f
+                                fi
+                        
+                                if [[ $f == *.yaml ]] ; then
+                                    filename="$(basename -- "$f" .yaml)"
+                                    filename="$filename.md"
+
+                                    widdershins --language_tabs 'java:Java' 'go:Go' 'javascript:JavaScript' -o workspace/$filename $f
+                                fi
+                                
+                                if [[ $f == *.yml ]] ; then
+                                    filename="$(basename -- "$f" .yml)"
+                                    filename="$filename.md"
+
+                                    widdershins --language_tabs 'java:Java' 'go:Go' 'javascript:JavaScript' -o workspace/$filename $f
+                                fi
+
+                                if [[ $f == *.md ]] ; then
+                                    filename="$(basename -- "$f" .md)"
+                                    filename="$filename.md"
+
+
+                                    cp $f workspace/$filename
+                                fi
+                        
+                            fi
+                            
+                        done
+                        
+                        rm -rf files/*
+                       
+                        '''
+                    }
+                }
+            }
+        }
+            
+        stage('Create Parent Folders') {
+            steps {
+                script {
+                    /*
+                    * Descripcion:
+                    *   Si y solo si hay APIs afectadas:
+                    * ---------Script bash
+                    *  1. Se crean si no existen las siguientes carpetas
+                    *  MDs, DRAFT, PUBLISH
+                    */
+                    if( myAPIChanges.isAPIChanged()) {
+                        sh '''#!/bin/bash
+                        
+                        MDS_FOLDER="MDs/"
+                        if [ ! -d "$MDS_FOLDER" ]; then
+                            mkdir $MDS_FOLDER
+                        fi
+                        DRAFT_FOLDER="DRAFT/"
+                        if [ ! -d "$DRAFT_FOLDER" ]; then
+                            mkdir $DRAFT_FOLDER
+                        fi
+                        PUBLISH_FOLDER="PUBLISH/"
+                        if [ ! -d "$PUBLISH_FOLDER" ]; then
+                            mkdir $PUBLISH_FOLDER
+                        fi
+                        '''
+                    }
+                }
+            }
+        }
+        
+        stage('Create Subfolders and MDs') {
+            steps {
+                script {
+                    if( myAPIChanges.isAPIChanged()) {
+                    /*
+                    * Descripcion:
+                    *   Si y solo si hay APIs afectadas:
+                    * ---------Script bash
+                    *  1. Para cada fichero en workspace
+                    *  1.1 Se extrae la cabecera y el versionado del fichero,a si como el nombre del mismo
+                    *  1.2 Se crea en MDs, PUBLISH, y DRAFT la carpeta dentro de en/docs/ con el nombre de la API sobre la que se esta iterando
+                    *  1.3 Se crea _index.md en DRAFT necesario para HUGO
+                    */
+                        sh '''#!/bin/bash
+                        
+                        ls workspace | while read line; do
+
+                            echo "line $line"
+                        
+                            #extract information from name
+                            header="$(basename -- "$line" .md)"
+                            name="${header#*__}"
+                            version="${header%__*}"
+                            version1="${version%%.*}"
+                            version2="${version#*.}"
+                            version2="${version2%.*}"
+                            version3="${version##*.}"
+                            
+                            if [ ! -d "MDs/en/docs/$name" ]; then
+                                mkdir -p MDs/en/docs/$name
+                            fi
+                            
+                            if [ ! -d "DRAFT/en/docs/$name" ]; then
+                            
+                                mkdir -p DRAFT/en/docs/$name
+                                
+                                #create the _index.md file (required by hugo) for the endpoint
+                                title=$(cat workspace/$line | grep -m 1 -h "title: " | head -1)
+                                cd "DRAFT/en/docs/${name}"
+                                
+                                echo """---
+"$title"
+description: ""
+draft: false
+weight: 1
+collapsible: true
+---""" > _index.md
+                                cd ../../../..
+                            fi
+                            
+                            if [ ! -d "PUBLISH/en/docs/$name" ]; then
+                                mkdir -p PUBLISH/en/docs/$name
+                            fi
+                            
+                        done
+                    '''
+                    }
+                }
+            }
+        }
+
+        stage('Create Version Folders and Copy the File in MDs and Draft') {
+            steps {
+                script {
+                    if( myAPIChanges.isAPIChanged()) {
+                        /*
+                    * Descripcion:
+                    *   Si y solo si hay APIs afectadas:
+                    * ---------Script bash
+                    *  1. Para cada fichero en workspace
+                    *  1.1 Se extrae la cabecera y el versionado del fichero,a si como el nombre del mismo
+                    *  1.2 Se crea en MDs, PUBLISH, y DRAFT la carpeta dentro de en/docs/ con el nombre de la API sobre la que se esta iterando
+                    *  1.3 Se crea _index.md en DRAFT necesario para HUGO
+                    */
+                        sh '''#!/bin/bash
+                        
+                        #create version folders
+                        ls workspace | while read line; do
+                        
+                            #extract information from name
+                            header="$(basename -- "$line" .md)"
+                            name="${header#*__}"
+                            version="${header%__*}"
+                            version1="${version%%.*}"
+                            version2="${version#*.}"
+                            version2="${version2%.*}"
+                            version3="${version##*.}"
+                            
+                            #create folder of the version in MDs
+                            if [ ! -d "MDs/en/docs/${name}/${version1}" ]; then
+                                
+                                echo "created MDs/en/docs/${name}"
+                                cd "MDs/en/docs/${name}"
+                                mkdir ${version1}
+                                cd ../../../..
+                            fi
+                            
+                            #create folder of the version in DRAFT
+                            if [ ! -d "DRAFT/en/docs/${name}/${version1}" ]; then
+                                
+                                echo "created DRAFT/en/docs/${name}"
+                                #create folder of the version in DRAFT
+                                cd "DRAFT/en/docs/${name}"
+                                mkdir ${version1}
+                                
+                                #create the _index.md (required by hugo) file for the version
+                                cd ${version1}
+                                
+                                echo """---
+title: "V${version1}"
+description: ""
+draft: false
+weight: $(( 100 - version2))
+collapsible: true
+---""" > _index.md
+                                cd ../../../../..
+                            fi
+    
+                            #copy file to MDs
+                            cp workspace/$line MDs/en/docs/${name}/${version1}/${line}
+                            
+                            #copy file to draft
+                            cp workspace/$line DRAFT/en/docs/${name}/${version1}/${line}
+                            
+                        done
+                    '''
+                    }
+                }
+            }
+        }
+
+
+        stage('Enrich Draft') {
+            steps {
+                script {
+                    if( myAPIChanges.isAPIChanged()) {
+                    /*
+                    * Descripcion:
+                    *   Si y solo si hay APIs afectadas:
+                    * ---------Script bash
+                    *  1. Para cada fichero en workspace
+                    *  1.1 Se extrae la cabecera y el versionado del fichero,a si como el nombre del mismo
+                    *  1.2 Se obtiene el enriquecido si aplica
+                    *  1.3 Se realiza el enriquecido mediante git-merge con el fichero actual
+                    * 
+                    */
+                        try {
+                        sh '''#!/bin/bash
+                            
+                            ls workspace | while read line; do
+                            
+                                #extract information from name
+                                header="$(basename -- "$line" .md)"
+                                name="${header#*__}"
+                                version="${header%__*}"
+                                version1="${version%%.*}"
+                                version2="${version#*.}"
+                                version2="${version2%.*}"
+                                version3="${version##*.}"
+                                
+                                
+                            #enrich draft version based in previous Publish version
+                                
+                                if [ -n "$(ls -A "PUBLISH/en/docs/${name}/${version1}/" 2>/dev/null)" ]; then
+                                
+                                    #get Higher mid version value
+                                    maxVersion2Infolder=$( ls --hide='_index.md' PUBLISH/en/docs/${name}/${version1}/ | sort -nr -t . -k 2 | head -n1)
+                                    maxVersion2Infolder="$(basename -- "$maxVersion2Infolder" .md)"
+                                    maxVersion2Infolder="${maxVersion2Infolder%__*}"
+                                    maxVersion2Infolder="${maxVersion2Infolder#*.}"
+                                    maxVersion2Infolder="${maxVersion2Infolder%.*}"
+                                    
+                                    #get Higher version file in folder
+                                    highestVersionInFolder=$(ls PUBLISH/en/docs/${name}/${version1}/${version1}.${maxVersion2Infolder}.*  | sort -nr -t . -k 3  | head -n1)
+                                    highestVersionInFolderName="$(basename -- "$highestVersionInFolder")"
+                                    
+                                    echo "highestVersionInFolder $highestVersionInFolder"
+                                    
+                                    #merge file with enriched file
+                                    git merge-file \
+                                        DRAFT/en/docs/${name}/${version1}/${line} \
+                                        MDs/en/docs/${name}/${version1}/${highestVersionInFolderName} \
+                                        PUBLISH/en/docs/${name}/${version1}/${highestVersionInFolderName}
+                                    
+                                fi
+                            done
+                        '''
+                        }catch (err){
+                            echo 'Enrichment of the DRAFT has failed'
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Clear') {
+            steps {
+                script {
+                    /*
+                    * Descripcion:
+                    *   Si y solo si hay APIs afectadas:
+                    * ---------Script bash
+                    *  1. Se borran los fichero missing_commits_file, missing_changes_file
+                    *   2. Se borra el directorio workspace
+                    */
+                if(myAPIChanges.isAPIChanged()) {
+                    sh '''#!/bin/bash
+                        if [[ -f missing_commits_file ]]; then
+                            rm missing_commits_file
+                        fi
+                        if [[ -f missing_changes_file ]]; then
+                            rm missing_changes_file
+                        fi
+                        rm -rf files workspace
+                    '''
+                    }
+                }
+            }
+        }
+        
+        stage('Push to Git') {
+            steps {
+                script {
+                    if( myAPIChanges.isAPIChanged()) {
+                                            /*
+                    * Descripcion:
+                    *   Si y solo si hay APIs afectadas:
+                    * ---------Script bash
+                    *  0- Con las credenciales correspondientes
+                    *  1. Se establece la url del repositorio remoto
+                    *   2. Se establece el usuario y su email
+                    * 3. Se realiza un commit con las APIs afectadas.
+                    */
+                        withCredentials([usernamePassword(credentialsId: '806bdc4e-af90-4255-83fc-b434c30a6720', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                            
+                            sh '''#!/bin/bash
+                                git remote set-url origin "https://${USERNAME}:${PASSWORD}@$UPLOAD"
+                                git config user.email "HUGO AUTOMATED SYSTEM"
+                                git config user.name  "HUGO AUTOMATED SYSTEM"
+                                
+                                #push to documentation branch
+                                git add -A
+                                git commit -m "HUGO AUTOMATIC COMMIT"
+                                git push --set-upstream origin HEAD:documentation
+                                echo "Last affected commit:"
+                                cat current_commit
+                                '''
+                        }
+                    }
                 }
             }
         }
