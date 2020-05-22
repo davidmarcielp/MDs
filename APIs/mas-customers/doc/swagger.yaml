@@ -1,0 +1,2235 @@
+openapi: 3.0.1
+info:
+  title: MasCRM API
+  description: I am the MasCRM API.
+  termsOfService: 'https://swagger.io/tools/swaggerhub/'
+  contact:
+    email: juanramon.pozo@masmovil.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: 'http://swagger.io'
+servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/Masmovil/mascustomer/1.0.0
+  - url: 'http://localhost:8080'
+    description: local enviroment
+  - url: 'https://mysim-master.private.dev-01.k8s.masmovil.com/mascrm/v1'
+    description: development enviroment
+  - url: 'https://mysim-sta.private.sta-01.k8s.masmovil.com/mascrm/v1'
+    description: stagging enviroment
+tags:
+  - name: accounts
+    description: Access to accounts customers
+  - name: subscriptions
+    description: Access to subscriptions
+  - name: users
+    description: Access to user info
+  - name: signups
+    description: signups new clients and purchase new products
+paths:
+  /accounts/{accountId}:
+    get:
+      tags:
+        - accounts
+      summary: Get info account
+      description: Get info account for a account id.
+      operationId: getAccount
+      parameters:
+        - name: accountId
+          in: path
+          description: ID of account that needs to be fetched
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccountInfo'
+        '400':
+          description: Invalid account ID supplied
+          content: {}
+        '404':
+          description: Account not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /accounts/{accountId}/compatible-bundles:
+    get:
+      tags:
+        - accounts
+      summary: Get account compatible bundles
+      description: Get account compatible bundles
+      operationId: getAccountCompatibleBundles
+      parameters:
+        - name: accountId
+          in: path
+          description: ID of account that needs to be fetched
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: array of compatible bundles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CompatibleBundles'
+        '400':
+          description: Invalid account ID supplied
+          content: {}
+        '404':
+          description: Compatible account bundles not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /accounts/{accountId}/paymentinfo:
+    get:
+      tags:
+        - accounts
+      summary: Get payment info account
+      description: Get payment info account for a account id.
+      operationId: getAccountPaymentInfo
+      parameters:
+        - name: accountId
+          in: path
+          description: ID of account that needs to be fetched
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentInfo'
+        '400':
+          description: Invalid account ID supplied
+          content: {}
+        '404':
+          description: Account not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /accounts/{accountId}/campaigns:
+    get:
+      tags:
+        - accounts
+      summary: Get Account Campaigns
+      description: get account campaigns
+      operationId: getAccountCampaigns
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Campaigns'
+        '400':
+          description: Invalid account id supplied
+          content: {}
+
+  /accounts/{accountId}/permanence:
+    get:
+      tags:
+        - accounts
+      summary: Get Account Permanence. Items are ordered with end date descending order.
+      description: get account permanence
+      operationId: getAccountPermanence
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccountPermanence'
+        '400':
+          description: Invalid account id supplied
+          content: {}
+
+  /accounts/{accountId}/invoices:
+    get:
+      tags:
+        - accounts
+      summary: Get invoice info
+      description: get invoice info
+      operationId: getInvoiceInfo
+      parameters:
+        - name: accountId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvoiceInfo'
+        '400':
+          description: Invalid account ID supplied
+          content: {}
+        '404':
+          description: Account invoice not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /subscriptions/{subscriptionId}:
+    get:
+      tags:
+        - subscriptions
+      summary: Get info subscription with subscription id
+      description: get info subscription
+      operationId: getSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: Identification of subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: query
+          in: query
+          required: false
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Query'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '400':
+          description: Invalid subscription ID supplied
+          content: {}
+        '404':
+          description: subscription not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /subscriptions/{subscriptionId}/balance:
+    get:
+      tags:
+        - subscriptions
+      summary: Get prepaid subscription balance
+      description: get prepaid subscription balance
+      operationId: getSubscriptionBalance
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: Identification of subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionBalance'
+        '400':
+          description: Invalid subscription ID supplied
+          content: {}
+        '404':
+          description: No prepaid subscription found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /subscriptions/{subscriptionId}/products:
+    get:
+      tags:
+        - subscriptions
+      summary: Get info products by subscription id
+      description: get info products
+      operationId: getProductSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: Identification of subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: query
+          in: query
+          required: false
+          description: Accepted fields in Include.<br> historic_dates-> Last date change of rate. <br>compatibilities-> Rate compatible. <br>For example {"include":["compatibilities","historic_date"]}
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Query'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionProduct'
+        '400':
+          description: Invalid subscription ID supplied
+          content: {}
+        '404':
+          description: subscription not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+    patch:
+      tags:
+        - subscriptions
+      summary: Change subscription product
+      description: Change subscription product
+      operationId: patchSubscriptionProduct
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: subscription identifier
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Change subscription product
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeSubscriptionProductRequest'
+      responses:
+        '201':
+          description: successful operation
+          content: {}
+        '400':
+          description: Invalid subscription or product id
+          content: {}
+        '404':
+          description: pair subscription - product not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /subscriptions/{subscriptionId}/bonuses:
+    get:
+      tags:
+        - subscriptions
+      summary: Get info bonus by subscription id
+      description: get info bonus
+      operationId: getBonusSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: Identification of subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: query
+          in: query
+          required: false
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Query'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionBonus'
+        '400':
+          description: Invalid subscription ID supplied
+          content: {}
+        '404':
+          description: subscription not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+    put:
+      tags:
+        - subscriptions
+      summary: Contract bonuses by subscription id
+      description: Contract bonuses
+      operationId: putBonusesSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: Identification of subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Add subscription bonus
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubscriptionBonusesRequest'
+      responses:
+        '201':
+          description: successful operation
+          content: {}
+        '400':
+          description: Invalid subscription or bonus id
+          content: {}
+        '404':
+          description: bonus not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /subscriptions/{subscriptionId}/bonuses/{bonusId}:
+    delete:
+      tags:
+        - subscriptions
+      summary: Delete bonuses by subscription id
+      description: delete bonuses active
+      operationId: deleteBonusesSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: Identification of subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: bonusId
+          in: path
+          description: bonus identifier
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '202':
+          description: successful operation
+          content: {}
+        '400':
+          description: Invalid subscription or bonus id
+          content: {}
+        '404':
+          description: pair bonus not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+
+  /subscriptions/{subscriptionId}/services:
+    get:
+      tags:
+        - subscriptions
+      summary: Get info services by subscription id
+      description: get info services
+      operationId: getServicesSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: Identification of subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: query
+          in: query
+          required: false
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Query'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionServices'
+        '400':
+          description: Invalid subscription ID supplied
+          content: {}
+        '404':
+          description: subscription not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+  /subscriptions/{subscriptionId}/services/{serviceId}:
+    patch:
+      tags:
+        - subscriptions
+      summary: Activate / Deactivate service
+      description: Activate / Deactivate service
+      operationId: patchSubscriptionService
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: subscription identifier
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: serviceId
+          in: path
+          description: service identifier
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Change service status
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceStatus'
+      responses:
+        '201':
+          description: successful operation
+          content: {}
+        '400':
+          description: Invalid subscription or service id
+          content: {}
+        '404':
+          description: pair subscription - service not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /subscriptions/{subscriptionId}/barrings:
+    get:
+      tags:
+        - subscriptions
+      summary: Get barrings info by subscription id
+      description: get barrings info
+      operationId: getSubscriptionBarrings
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: Identification of subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionBarrings'
+        '400':
+          description: Invalid subscription ID supplied
+          content: {}
+        '404':
+          description: subscription not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /subscriptions/{subscriptionId}/barrings/{barringId}:
+    patch:
+      tags:
+        - subscriptions
+      summary: Activate / Deactivate barring
+      description: Activate / Deactivate service
+      operationId: patchBarring
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: subscription identifier
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: barringId
+          in: path
+          description: barring identifier
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        description: Change barring status
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServiceStatus'
+      responses:
+        '201':
+          description: successful operation
+          content: {}
+        '400':
+          description: Invalid subscription or service id
+          content: {}
+        '404':
+          description: pair subscription - service not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /subscriptions/{subscriptionId}/consumption:
+    get:
+      tags:
+        - subscriptions
+      summary: Get current month consumption grouped by subscription id
+      description: return current month consumption summary, grouping the information by consumption inside or outside the bonus
+      operationId: getConsumptionGroupedSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: Identification of subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: query
+          in: query
+          required: false
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Query'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionConsumptionGrouped'
+        '400':
+          description: Invalid subscription ID supplied
+          content: {}
+        '404':
+          description: subscription not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /users/tree/full:
+    get:
+      tags:
+        - users
+      summary: Get full customer tree
+      description: Get full customer tree
+      operationId: usersFull
+      parameters:
+        - name: nif
+          in: query
+          deprecated: true
+          description: Deprecated use documentType and document (user nif)
+          schema:
+            type: string
+        - name: documentType
+          in: query
+          description: Document type id
+          schema:
+            $ref: '#/components/schemas/DocumentTypeSearch'
+        - name: document
+          in: query
+          description: Document with numbers and letters
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users-user'
+
+        '400':
+          description: Nif parameter required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 15
+                status: BAD_REQUEST
+                message: Bad Request
+                DetailMsg: Nif parameter is required
+
+  /subscriptions/{subscriptionId}/consumption/detail:
+    get:
+      tags:
+        - subscriptions
+      summary: Get consumption details between two dates or actual month
+      description: Get consumption details between two dates. if it does not include dates, it will take the current month by subscription ID
+      operationId: getConsumptionDetailSubscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          description: Identification of subscription
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: start_date
+          in: query
+          description: start date query with format yyyy-mm-dd, for example 2020-01-01
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: end_date
+          in: query
+          description: end date query with format yyyy-mm-dd, for example 2020-01-01
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: query
+          in: query
+          required: false
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Query'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SubscriptionDetailConsumption'
+        '400':
+          description: Invalid subscription ID supplied
+          content: {}
+        '404':
+          description: subscription not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+  /users/tree:
+    get:
+      tags:
+        - users
+      summary: Get customer tree
+      description: Get customer tree
+      operationId: users
+      parameters:
+        - name: email
+          in: query
+          description: user email
+          schema:
+            type: string
+        - name: number
+          in: query
+          description: user number
+          schema:
+            type: string
+        - name: nif
+          in: query
+          description: Deprecated use documentType and document (user nif)
+          deprecated: true
+          schema:
+            type: string
+        - name: documentType
+          in: query
+          description: Document type id
+          schema:
+            $ref: '#/components/schemas/DocumentTypeSearch'
+        - name: document
+          in: query
+          description: Document with numbers and letters
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successfull operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Users-user'
+        '400':
+          description: Email/msisdn/nif parameter required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 15
+                status: BAD_REQUEST
+                message: Bad Request
+                DetailMsg: Email parameter is required
+        '403':
+          description: The state does not allow login
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 10
+                status: FORBIDDEN
+                message: Forbidden
+                DetailMsg: The state does not allow login
+
+  /users/{userId}:
+    get:
+      tags:
+        - users
+      summary: Get info user
+      description: get info user
+      operationId: getInfoUserById
+      parameters:
+        - name: userId
+          in: path
+          description: get info
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          description: Invalid subscription ID supplied
+          content: {}
+        '404':
+          description: subscription not found
+          content: {}
+        '405':
+          description: Validation exception
+          content: {}
+
+
+  /users/{userId}/accounts:
+    get:
+      tags:
+        - users
+      summary: Get info user
+      description: get info user
+      operationId: getInfoAccountsUserById
+      parameters:
+        - name: userId
+          in: path
+          description: get info
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UsersAccountInfo'
+        '400':
+          description: Invalid user info ID supplied
+          content: {}
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 1
+                status: NOT_FOUND
+                message: Resource Not Found
+                DetailMsg: User not found
+
+  /signups:
+    post:
+      tags:
+        - signups
+      summary: Signup new client and purchase new products
+      description: Signup new client and purchase new products
+      operationId: signups
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'https://api.swaggerhub.com/domains/Masmovil/signups/1.0.0#/components/schemas/SignupsRequest'
+      #              $ref: '#/components/schemas/SignupsRequest'
+      responses:
+        '200':
+          description: signup ok
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/Masmovil/signups/1.0.0#/components/schemas/SignupsResponse'
+        '400':
+          description: Invalid body
+          content: {}
+
+  /signups/master-data/{dealerId}:
+    get:
+      tags:
+        - signups
+      operationId: getSignupsMasterData
+      parameters:
+        - name: dealerId
+          required: true
+          in: path
+          description: dealer
+          schema:
+            type: string
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: 'https://api.swaggerhub.com/domains/Masmovil/signups/1.0.0#/components/schemas/SignupsMasterData'
+
+  /workorders/change-order:
+    post:
+      tags:
+        - workorders
+      summary: Executes changeOrder proxy call to mysimWS
+      description: Executes changeOrder proxy call to mysimWS
+      operationId: changeOrderProxy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeOrderRequest'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChangeOrderResponse'
+        '400':
+          description: Invalid body
+          content: {}
+        '404':
+          description: Seller was not found in MYSIM
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 15
+                status: BAD_REQUEST
+                message: Bad Request
+                DetailMsg: No user found for seller
+        '405':
+          description: Validation exception
+          content: {}
+
+  /notifications/external:
+    post:
+      tags:
+        - notifications
+      summary: Register external notifications to mysimWS
+      description: Executes changeOrder to mysimWS. this service works as a proxy
+      operationId: registerExternalNotificationProxy
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExternalNotificationRequest'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExternalNotificationResponse'
+        '400':
+          description: Invalid body
+          content: {}
+        '404':
+          description: Fields was not found in MYSIM
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorMessage'
+              example:
+                code: 15
+                status: BAD_REQUEST
+                message: Bad Request
+                DetailMsg: No notification found
+        '405':
+          description: Validation exception
+          content: {}
+
+components:
+  schemas:
+    ChangeOrderRequest:
+      type: object
+      required: ["seller", "workorderid", "changetype"]
+      properties:
+        seller:
+          type: string
+        workorderid:
+          type: string
+        reason:
+          type: string
+        parameters:
+          type: string
+        changetype:
+          type: string
+
+    ChangeOrderResponse:
+      type: object
+      properties:
+        errorVO:
+          type: object
+          $ref: '#/components/schemas/ErrorVO'
+
+    ExternalNotificationRequest:
+      type: object
+      required: ["msisdn", "tag_sms", "date"]
+      properties:
+        msisdn:
+          type: string
+        tag_sms:
+          type: string
+        date:
+          type: string
+        serviceClass:
+          type: string
+        offerId:
+          type: string
+        serveFeeAmount:
+          type: string
+        offerStartDate:
+          type: string
+        offerExpiryDate:
+          type: string
+        subscriberBalance:
+          type: string
+
+    ExternalNotificationResponse:
+      type: object
+      properties:
+        errorVO:
+          type: object
+          $ref: '#/components/schemas/ErrorVO'
+
+    ErrorVO:
+      type: object
+      properties:
+        error_code:
+          type: string
+        error_description:
+          type: string
+        operation_date:
+          type: string
+
+    CompatibleBundles:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/BundleItem'
+
+    BundleItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        value:
+          type: string
+
+    ServiceStatus:
+      type: object
+      properties:
+        active:
+          type: boolean
+          example: true
+
+    Service:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        value:
+          type: string
+          description: Bonus Name
+        date_last_modified:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: date last modified
+        changeable:
+          type: boolean
+          description: indicates that the service can change status
+        active:
+          type: boolean
+          description: indicates that the service is active
+
+    Barring:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Barring identification
+          enum:
+            - 1
+            - 2
+        value:
+          type: string
+          description: Barring Name
+          enum:
+            - evento robo
+            - evento perdida
+        date_last_modified:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: date last modified
+        description:
+          type: string
+          description: description of the reason barring
+
+    AccountBundleCampaign:
+      type: object
+      properties:
+        campaign_id:
+          type: integer
+          format: int64
+          description: campaign id
+        effective_date_ini:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: campaign initial effective date
+        effective_date_end:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: campaign end effective date
+        campaign_name:
+          type: string
+          description: campaign name
+        account_bundle_id:
+          type: integer
+          format: int64
+        campaign_benefit_type:
+          $ref: '#/components/schemas/CampaignBenefitType'
+        campaign_type:
+          $ref: '#/components/schemas/CampaignType'
+
+    AccountCampaign:
+      type: object
+      properties:
+        campaign_id:
+          type: integer
+          format: int64
+          description: campaign id
+        begin_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: campaign activation date
+        campaign_name:
+          type: string
+          description: campaign name
+        end_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: campaign end date
+        campaign_benefit_type:
+          $ref: '#/components/schemas/CampaignBenefitType'
+        campaign_type:
+          $ref: '#/components/schemas/CampaignType'
+
+    SubscriptionCampaign:
+      type: object
+      properties:
+        subscription_id:
+          type: integer
+          format: int64
+          description: subscription id
+        campaign_id:
+          type: integer
+          format: int64
+          description: campaign id
+        campaign_code:
+          type: string
+          description: campaign code
+        campaign_name:
+          type: string
+          description: campaign name
+        association_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: campaign association date
+        end_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: campaign end date
+        account_bundle_id:
+          type: integer
+          format: int64
+        campaign_benefit_type:
+          $ref: '#/components/schemas/CampaignBenefitType'
+        campaign_type:
+          $ref: '#/components/schemas/CampaignType'
+
+
+    AccountPermanence:
+      type: object
+      properties:
+        subscription_binding_period_id:
+          type: integer
+          format: int64
+          description: subscription binding period id
+        subscription_id:
+          type: integer
+          format: int64
+          description: subscription id
+        start_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: start date
+        end_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: end date
+        penalty_amount:
+          type: number
+          format: double
+          description: permanence penalty amount
+        permanence_months:
+          type: integer
+          format: int32
+          description: permanence months
+        account_bundle_id:
+          type: integer
+          format: int64
+          description: account bundle id
+        binding_type:
+          $ref: '#/components/schemas/BindingType'
+
+    Bonus:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        value:
+          type: string
+          description: Bonus Name
+        start_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: bonus start date
+        end_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+          description: bonus end date
+        price:
+          type: number
+          format: int64
+
+    InvoiceInfo:
+      type: object
+      properties:
+        last_invoice_value:
+          type: number
+          format: double
+          description: last invoice value
+        invoice_delivery_mode:
+          type: string
+          description: invoice delivery mode
+          enum:
+            - yosoymas
+            - paper
+            - email
+        invoice_date:
+          type: string
+          description: invoice date
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+
+    AccountInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: id de la cuenta
+          example:  "5338507"
+        account_number:
+          type: string
+          description: numero de contrato
+          example:  "MM-5338507"
+        work_order_id:
+          type: string
+          description: work order identifier
+          example:  "MYSIM_817"
+        activation_date:
+          type: string
+          description: account activation date
+          format: date-time
+          example:  "2019-12-09T09:58:34Z"
+        billing_type:
+          $ref: '#/components/schemas/BillingType'
+        status:
+          $ref: '#/components/schemas/AccountStatus'
+
+    UsersAccount:
+      type: object
+      properties:
+        account_id:
+          type: integer
+          format: int64
+          description: id de la cuenta
+        status:
+          $ref: '#/components/schemas/AccountStatus'
+
+    UsersAccountInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: user id (userId)
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UsersAccount'
+
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        subscription_status:
+          $ref: '#/components/schemas/Status'
+        sell_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+        activated_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+        end_date:
+          type: string
+          format: date-time
+          example:  "2017-09-15T22:00:00Z"
+        subscription_type:
+          $ref: '#/components/schemas/SubscriptionType'
+        origin:
+          $ref: '#/components/schemas/Origin'
+
+    CampaignBenefitType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Campaign Benefit Type Id
+          enum:
+            - 1
+            - 2
+        value:
+          type: number
+          format: double
+
+    BindingType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        value:
+          type: string
+
+    CampaignType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+        value:
+          type: string
+
+    BillingType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Identification billing type
+          enum:
+            - 1
+            - 2
+            - 3
+        value:
+          type: string
+          description: description billing type
+          enum:
+            - pospago
+            - prepago clasico
+            - recarga automatica
+
+    GroupInvoice:
+      type: object
+      description: id grupo de facturacion, por si se factura a nivel de customer y no por contrato
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Id group invoice
+          enum:
+            - 0
+            - 1
+        value:
+          type: string
+          description: describe group invoice
+          enum:
+            - pending1
+            - pending2
+
+    PaymentInfo:
+      type: object
+      description: Info payment
+      properties:
+        bank_entity_id:
+          type: integer
+          format: int32
+          description: Identifcation bank entity
+        bank_entity_name:
+          type: string
+          description: Name bank entity
+        iban:
+          type: string
+          description: iban os account
+        credit_card:
+          type: string
+          description: first 4 digits and last 4 digits of credit card
+
+
+    LanguageType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: language identification
+          enum:
+            - 90
+            - 91
+            - 92
+            - 93
+            - 96
+            - 97
+        value:
+          type: string
+          description: language value
+          enum:
+            - Castellano
+            - Catalan
+            - Galego
+            - Vasco
+            - Ingles
+            - Portugues
+
+    SubscriptionType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: identification subscription type
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+        value:
+          type: string
+          description: Subscription type name
+          enum:
+            - PRE-PAGO
+            - POST-PAGO
+            - FIJO ANALOGICO
+            - FIJO DIGITAL
+            - INTERNET ADSL
+            - INTERNET FTTH
+
+    SubscriptionBalance:
+      type: object
+      properties:
+        msisdn:
+          type: integer
+          format: int32
+          description: subscription msisdn
+        balance:
+          type: number
+          format: double
+        host_cfg:
+          type: number
+          format: int32
+
+
+    SubscriptionProduct:
+      type: object
+      required:
+        - id
+        - product
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: identification subscription
+        product:
+          $ref: '#/components/schemas/Product'
+        bundle:
+          $ref: '#/components/schemas/Bundle'
+
+    ChangeSubscriptionProductRequest:
+      type: object
+      required:
+        - productId
+      properties:
+        productId:
+          type: integer
+          format: int64
+          description: product id
+
+    SubscriptionBonusesRequest:
+      type: object
+      required:
+        - bonusId
+      properties:
+        bonusId:
+          type: integer
+          format: int64
+          description: bonus id
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: identification product
+        value:
+          type:
+            string
+          description: name product
+        historic_date:
+          type: string
+          description: Last date change of rate.
+        compatibilities:
+          type: array
+          description: Rates compatibles.
+          items:
+            $ref: '#/components/schemas/Product'
+        scheduled:
+          type: object
+          description: Scheduled product change date, return this item only if you have a rate change scheduled
+          $ref: '#/components/schemas/ScheduledProduct'
+
+    ScheduledProduct:
+      type: object
+      properties:
+        request_date:
+          type: string
+          format: date-time
+        process_date:
+          type: string
+          format: date-time
+        scheduled_date:
+          type: string
+          format: date-time
+        destination_product:
+          type: object
+          description: Product info
+          $ref: '#/components/schemas/Product'
+
+    Bundle:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: identification bundle
+        value:
+          type: string
+          description: name bundle
+
+    AccountStatus:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: account status
+          enum:
+            - 3
+            - 6
+            - 7
+            - 13
+        value:
+          type: string
+          description: name of account status
+          enum:
+            - ACTIVO
+            - TERMINADO
+            - BLOQUEO TEMPORAL
+            - PENDIENTE DE ACEPTACION
+
+    Status:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: identification subscription status
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 6
+            - 7
+            - 9
+            - 10
+            - 39
+            - 40
+            - 46
+            - 50
+        value:
+          type: string
+          description: Subscription status value
+          enum:
+            - INSTALADO
+            - PRE-ACTIVADO
+            - ACTIVO
+            - BLOQUEO POR SALDO
+            - TERMINADO
+            - BLOQUEO TEMPORAL
+            - PENDIENTE TERMINACION
+            - BLOQUEO LIMITE CONSUMO
+            - SUSPENSION PENDIENTE
+            - RECONEXION PENDIENTE
+            - OK
+            - PENDIENTE BLOQUEO TEMPORAL
+
+    Origin:
+      type: object
+      description:  to get origin use in url object query with include = origin. /subscriptions/{id}?query={"include":["origin"]}
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: identification origin
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+            - 6
+            - 7
+            - 8
+            - 9
+            - 10
+        value:
+          type: string
+          description: name of origin
+          enum:
+            - NUEVA
+            - PORTABILIDAD
+            - CENTRO DE ATENCION AL CLIENTE
+            - MIGRACION CONTRATO
+            - REEMPLAZO
+            - YOSOYMAS
+            - PORTAL DE DISTRIBUICION
+            - CANAL ONLINE (AFILIADO)
+            - MARCA BLANCA (MAYORISTA)
+            - PORTABILIDAD MARCAS
+
+    Campaigns:
+      type: object
+      properties:
+        subscription_campaigns:
+          type: array
+          items:
+            $ref: '#/components/schemas/SubscriptionCampaign'
+        account_campaigns:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountCampaign'
+        account_bundle_campaigns:
+          type: array
+          items:
+            $ref: '#/components/schemas/AccountBundleCampaign'
+
+
+    SubscriptionBonus:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: identification subscription
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Bonus'
+
+    SubscriptionServices:
+      type: object
+      properties:
+        subscription_id:
+          type: integer
+          format: int64
+          description: identification subscription
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Service'
+
+    SubscriptionBarrings:
+      type: object
+      properties:
+        subscription_id:
+          type: integer
+          format: int64
+          description: identification subscription
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Barring'
+
+    SubscriptionDetailConsumption:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: identification subscription
+        from:
+          type: integer
+          format: int32
+          description: msisdn or fixed number origin of the event
+        period_date:
+          type: object
+          $ref: '#/components/schemas/PeriodDate'
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/DetailConsumptionEvent'
+
+    DetailConsumptionEvent:
+      type: object
+      properties:
+        to:
+          type: string
+          description: event destination
+        initial_date:
+          type: string
+          format: date-time
+        end_date:
+          type: string
+          format: date-time
+        type:
+          type: string
+          description: subtype transfer
+          enum:
+            - VOICE
+            - DATA
+            - SMS
+            - MMS
+        sub_type:
+          type: string
+          description: type transfer
+          enum:
+            - VOZ NACIONAL
+            - SMS NACIONAL
+            - MMS NACIONAL
+            - DATOS NACIONAL
+            - VOZ INTERNACIONAL
+            - SMS INTERNACIONAL
+            - MMS INTERNACIONAL
+            - DATOS INTERNACIONAL
+            - VOZ ROAMING
+            - SMS ROAMING
+            - MMS ROAMING
+            - DATOS ROAMING
+        destination_description:
+          type: string
+          description: Extra information for some events, for example international calls, indicates the destination country of the call
+        unit:
+          type: string
+          description: unit bonus
+          enum:
+            - BYTES
+            - SECONDS
+            - NUMBER
+        value:
+          type: integer
+          format: int64
+          description: value transfers generated
+        pricing:
+          type: object
+          $ref: '#/components/schemas/pricing'
+
+    pricing:
+      type: object
+      properties:
+        cost:
+          type: number
+          format: double
+          description: event cost
+        in_rate:
+          type: boolean
+          description: Rate information is within tariff
+        bond:
+          type: object
+          $ref: '#/components/schemas/bond'
+
+    bond:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: identificator bond
+        name:
+          type: string
+          description: name bond
+
+    SubscriptionConsumptionGrouped:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: identification subscription
+        transfers:
+          type: object
+          $ref: '#/components/schemas/ConsumptionGrouped'
+
+    ConsumptionGrouped:
+      type: object
+      properties:
+        period_date:
+          type: object
+          $ref: '#/components/schemas/PeriodDate'
+        include_bonuses:
+          type: array
+          description: consumption within the bonds contracted by the subscription
+          items:
+            $ref: '#/components/schemas/IncludeBonuses'
+        exclude_bonuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExcludeBonuses'
+
+    IncludeBonuses:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: identificator bonus
+        name:
+          type: string
+          description: name bonus
+        consumed:
+          type: integer
+          format: int64
+          description: value consumed
+        size:
+          type: integer
+          format: int64
+          description: size bonus
+        unit:
+          type: string
+          description: unit bonus
+          enum:
+            - bytes
+            - seconds
+            - number
+        end_date:
+          type: string
+          description: end date bonus
+
+    ExcludeBonuses:
+      type: object
+      properties:
+        type:
+          type: string
+          description: type transfer
+          enum:
+            - VOZ NACIONAL
+            - SMS NACIONAL
+            - MMS NACIONAL
+            - DATOS NACIONAL
+            - VOZ INTERNACIONAL
+            - SMS INTERNACIONAL
+            - MMS INTERNACIONAL
+            - DATOS INTERNACIONAL
+            - VOZ ROAMING
+            - SMS ROAMING
+            - MMS ROAMING
+            - DATOS ROAMING
+        subtype:
+          type: string
+          description: subtype transfer
+          enum:
+            - voice
+            - data
+            - sms
+            - mms
+        value:
+          type: integer
+          format: int64
+          description: bytes transfers generated
+        unit:
+          type: string
+          description: unit bonus
+          enum:
+            - bytes
+            - seconds
+            - number
+        costs:
+          type: number
+          format: double
+          description: cost grouped by type of transfer
+
+    PeriodDate:
+      type: object
+      properties:
+        start_date:
+          type: string
+          format: date
+          description: start date of the period. Format yyyy-MM-dd
+        end_date:
+          type: string
+          format: date
+          description: end date of the period. Format yyyy-MM-dd
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        customer_id:
+          type: integer
+          format: int64
+        language:
+          $ref: '#/components/schemas/LanguageType'
+        scoring:
+          $ref: '#/components/schemas/Scoring'
+        document_type:
+          $ref: '#/components/schemas/DocumentType'
+        document_value:
+          type: string
+        sector:
+          $ref: '#/components/schemas/UserSector'
+        type:
+          $ref: '#/components/schemas/UserType'
+        personal:
+          $ref: '#/components/schemas/Personal'
+        business:
+          $ref: '#/components/schemas/Business'
+        group_invoice:
+          $ref: '#/components/schemas/GroupInvoice'
+        address_info:
+          $ref: '#/components/schemas/UserAddress'
+
+    Users-user:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 5302929
+        customer_id:
+          type: integer
+          format: int64
+          example: 5932161
+        accounts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Users-account'
+
+    Users-account:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 5349853
+        owner_id:
+          type: integer
+          format: int64
+          example: 5302929
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Users-subscription'
+
+    Users-subscription:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          example: 6124953
+        subscription_type:
+          $ref: '#/components/schemas/SubscriptionType'
+        status:
+          $ref: '#/components/schemas/Status'
+        user_id:
+          type: integer
+          format: int64
+          example: 5302929
+        identification_nr:
+          type: integer
+          format: int64
+          example: 659612241
+        bundle_id:
+          type: integer
+          format: int64
+
+    Personal:
+      type: object
+      properties:
+        first_name:
+          type: string
+        middle_name:
+          type: string
+        last_name:
+          type: string
+        gender:
+          type: string
+        birthdate:
+          type: string
+          format: 'date'
+        other_phone:
+          type: string
+        email:
+          type: string
+
+    Business:
+      type: object
+      properties:
+        company:
+          type: string
+        created_date:
+          type: string
+          format: 'date'
+        other_phone:
+          type: string
+        email:
+          type: string
+
+    DocumentType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: document type id
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+            - 5
+        value:
+          type: string
+          description: document type value
+          enum:
+            - NUMERO IDENTIFICACION FISCAL
+            - DNI
+            - TARJETA RESIDENCIA
+            - PASAPORTE
+            - CODIGO IDENTIFICACION FISCAL
+
+    UserSector:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+          description: Sector id
+          enum:
+            - 1
+            - 2
+            - 3
+            - 4
+        value:
+          type: string
+          description: Sector value
+          enum:
+            - RESIDENCIAL
+            - EMPRESA
+            - AUTONOMO
+            - HORECA
+
+    UserType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: User type id
+          enum:
+            - 1
+            - 2
+        value:
+          type: string
+          description: user type value
+          enum:
+            - PARTICULAR
+            - EMPRESA
+
+    UserAddress:
+      type: object
+      properties:
+        address:
+          type: string
+        state:
+          type: string
+        zip_code:
+          type: integer
+          format: int32
+        locality:
+          type: string
+
+    Scoring:
+      type: object
+      properties:
+        type:
+          type: integer
+          format: int32
+        external_value:
+          type: number
+          format: double
+        manual_value:
+          type: number
+          format: double
+
+
+    ErrorMessage:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          description: Custom error code
+        status:
+          type: string
+          description: Status
+        message:
+          type: string
+          description: Status message
+        detailMsg:
+          type: string
+          description: Detailed description of the error
+
+    Query:
+      type: object
+      properties:
+        filter:
+          type: array
+          items:
+            type: string
+        include:
+          type: array
+          items:
+            type: string
+
+    DocumentTypeSearch:
+      type: string
+      description: document type value
+      enum:
+        - NIF
+        - DNI
+        - TR
+        - PAS
+        - CIF

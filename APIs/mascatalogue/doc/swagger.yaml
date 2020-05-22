@@ -1,0 +1,2230 @@
+openapi: 3.0.0
+info:
+  title: Sales & Post-Sales REST API
+  version: 2.1.0
+servers:
+- url: /
+paths:
+  /catalogue/commercial_profiles:
+    get:
+      tags:
+      - Catalogue
+      summary: Get commercial profiles
+      parameters:
+      - name: service_provider_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: dealer_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: commercial_profile_type
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - CONVERGENT
+          - MOBILE
+      responses:
+        "200":
+          description: Commercial profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommercialProfile'
+              example:
+              - id: 335
+                type: MOBILE
+                name: 66_RESELLER_19
+                description: MM PAP 15/01/2020
+  /catalogue/commercial_products:
+    get:
+      tags:
+      - Catalogue
+      summary: Get commercial products
+      parameters:
+      - name: service_provider_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: commercial_profile_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: customer_segment_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - PARTICULAR
+          - EMPRESA
+      - name: customer_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Nuevo
+          - Existente
+      - name: subscription_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - PRE-PAGO
+          - POST-PAGO
+          - INTERNET FTTH
+          - FIJO ANALOGICO
+          - FIJO DIGITAL
+          - INTERNET ADSL
+      - name: billing_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - POSPAGO
+          - PREPAGO CLASICO
+          - PREPAGO AUTOMATICO
+      - name: numeration_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Nuevo numero
+          - Numero portado
+          - Numero entre marcas
+      - name: sale_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Venta
+          - Migración
+          - Añadir Línea
+          - Cartera
+      - name: channel_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - NUEVA
+          - PORTABILIDAD
+          - CENTRO DE ATENCION AL CLIENTE
+          - MIGRACION CONTRATO
+          - REEMPLAZO
+          - YOSOYMAS
+          - PORTAL DE DISTRIBUICION
+          - CANAL ONLINE (AFILIADO)
+          - MARCA BLANCA (MAYORISTA)
+          - PORTABILIDAD MARCAS
+          - MIGRACION HAPPYMOVIL
+      - name: center_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: user_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Commercial products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommercialProduct'
+              example:
+              - id: 109
+                name: TARIFA CERO PREPAGO 50MIN+1GB
+                marketing_name: TARIFA CERO PREPAGO 50MIN+1GB
+                commercial_info:
+                - id: 109ES1
+                  commercial_description: '<strong>Tarifa CERO prepago 50 Min + 1
+                    GB</strong>  <ul><li>Tarifa CERO Voz:0 cént/min los primeros 5
+                    minutos de cada llamada, a partir del minuto 6:3,63 cts/min (IGIC:3.21
+                    cts/min) .</li><li>Establecimiento:  18.15 cts (IGIC: 16.05 cts)
+                    SMS: 9,68 cts/sms (IGIC:8,56 cts/sms).</li><li>Bono voz incluido:
+                    50 min llamadas nacionales. una vez superado, aplica tarifa cero.
+                    </li><li>Internet: 1024 MB incluidos + 100 MB en baja velocidad
+                    (16 KB); una vez superados: 3,63 cts/MB (IGIC:3,21 cts/MB).</li><li>Tarifa
+                    valida 30 dias desde su activación y autorenovable cada 30 dias
+                    si se dispone de saldo suficiente </li><li>Renovable de manera
+                    anticipada enviando SMS gratuito con texto MMRENUEVA a 2377</li><li>En
+                    caso de no renovación:llamadas nacionales: 12.10 cts/min + 18.15
+                    establecimiento (IGIC:16.05cts) y consumo mínimo de 1,21 € mes
+                    (IGIC:1,07 €/mes) </li>  </ul>'
+                  language: ES
+                - id: 109EN1
+                  commercial_description: '<strong>Tarifa CERO prepago 50 Min + 1
+                    GB</strong>  <ul><li> Zero rate: 0 cént/min the first 5 mins of
+                    every call, from the 6 min : 3,63 cts/min (IGIC:3.21 cts/min)
+                    .</li><li> Call set up fee: 18.15 cts (IGIC: 16.05 cts) SMS: 9,68
+                    cts/sms (IGIC:8,56 cts/sms)</li><li> 60 min voice bundle included,
+                    valid for nationall calls. Once consumed Zero rate applies. </li><li>
+                    1 GB (1024 MB) data bundle included. Once consumed 100 MB on speed
+                    lowering; and once ended 3,63 cts/MB (IGIC:3,21 cts/MB). </li><li>
+                    Plan valid for 30 days from activation and auto-renewable every
+                    30 days if there´s enough balance available</li><li> Auto renewable
+                    sending a free sms to 2377 with the text mmrenewal</li><li> In
+                    case of no renovation: 12.10 cts/min + call set up:18,15 cts (IGIC:
+                    16,05 cts) y minimum consumption of 1,21 €/month (IGIC:1,07/month)
+                    </li>  </ul>'
+                  language: EN
+                fee:
+                - id: 1
+                  description: TARIFA CERO cuotamensual
+                  type: RecurringCharge
+                  subtype: ServiceFee
+                  recurrence_scheme: NonBoundToBillCycle
+                  recurrence_interval: 28
+                  paid_in_advance: "false"
+                  value:
+                  - id: TARIFA CERO cuotamensual value euro
+                    value: 23.5
+                    currency: euro
+                  terms: []
+                free_units_package:
+                - id: 175
+                  name: VOZ 50MIN TCPREPAGO
+                  marketing_name: VOZ 50MIN TCPREPAGO
+                  unit_amount: 3000
+                  is_recurring_package: "true"
+                  max_grants: 0
+                  recurrence_scheme: NonBoundToBillCycle
+                  recurrence_interval_type: BoundToActivation
+                  recurrence_interval_value: 28
+                  applicability_priority: 1
+                  package_type_name: VOZ
+                  is_mandatory: "true"
+                  is_mandatory_optional: "false"
+                  is_mandatory_for_sale: "false"
+                  fee: []
+                  promotion: []
+                - id: 177
+                  name: INTERNET 1GB TCPREPAGO
+                  marketing_name: INTERNET 1GB TCPREPAGO
+                  unit_amount: 1073741824
+                  is_recurring_package: "true"
+                  max_grants: 0
+                  recurrence_scheme: NonBoundToBillCycle
+                  recurrence_interval_type: BoundToActivation
+                  recurrence_interval_value: 28
+                  applicability_priority: 1
+                  package_type_name: DATOS
+                  is_mandatory: "true"
+                  is_mandatory_optional: "false"
+                  is_mandatory_for_sale: "false"
+                  fee: []
+                  promotion: []
+                - id: 178
+                  name: BAJADA VELOCIDAD PREPAGO
+                  marketing_name: BAJADA VELOCIDAD PREPAGO
+                  unit_amount: 104857600
+                  is_recurring_package: "true"
+                  max_grants: 0
+                  recurrence_scheme: NonBoundToBillCycle
+                  recurrence_interval_type: BoundToActivation
+                  recurrence_interval_value: 28
+                  applicability_priority: 1
+                  package_type_name: DATOS
+                  is_mandatory: "true"
+                  is_mandatory_optional: "false"
+                  is_mandatory_for_sale: "false"
+                  fee: []
+                  promotion: []
+                promotion: []
+              - id: 513
+                name: Tarifa Base Prepagament
+                marketing_name: Tarifa Base Prepagament
+                commercial_info: []
+                fee:
+                - id: 3
+                  description: Tarifa Base Prepagament conminimo
+                  type: RecurringCharge
+                  subtype: MinimumConsumption
+                  recurrence_scheme: BoundToBillCycle
+                  recurrence_interval: 0
+                  paid_in_advance: "false"
+                  value:
+                  - id: Tarifa Base Prepagament conminimo value euro
+                    value: 1
+                    currency: euro
+                  terms: []
+                free_units_package: []
+                promotion: []
+              - id: 341
+                name: TARIFA MAS 10GB
+                marketing_name: TARIFA MAS 10GB
+                commercial_info:
+                - id: 341ES1
+                  commercial_description: '<strong>Tarifa 0 y 8</strong><br/>Habla
+                    por 0 cts/minuto a clientes MÁSMÓVIL y por solo 8 cts/minuto al
+                    resto.<ul class=''descrip_products''><li>Voz: 0cts/min durante
+                    los primeros 10 minutos de cada llamada a clientes MÁSMÓVIL (15cts/est
+                    llamada). 8 cts/min exceso y llamadas al resto de operadores (15cts/est
+                    llamada).</li><li>SMS: 8cts/sms.</li><li>Internet: 3cts/MB.</li><li>Consumo
+                    mínimo: 1eur/mes.</li><li>Precios con IVA: 18,15cts/est llamada,
+                    9,68cts/min, 9,68cts/sms, 3,63cts/MB, 1,21eur/mes consumo mínimo.</li><li>Tarifas
+                    válidas para tráfico nacional, excluidos destinos especiales.</li></ul>'
+                  language: ES
+                - id: 341EN1
+                  commercial_description: '<p><strong>Tarifa 0 y 8 </strong><br/>Talk
+                    for 0eur with MÁSMÓVIL clients and  8 cts/min with rest.</br><ul
+                    class=''descrip_products''><li>Call cost: 0 cts/min first 10 minutes
+                    of each call to MÁSMÓVIL clients and 8 cts/min to rest national
+                    operator, any hour. (Call set-up fee 15 cts).</li><li>SMS: 8 cts/SMS.</li><li>Internet:
+                    3 cts/MB.</li><li>Available for all different payment methods:
+                    direct debit, automatic top-up and pay-as-you-go. </li><li>Minimum
+                    monthly consumption: 1 eur.</li><li>Excluding VAT. Rates valid
+                    for national traffic excluding special numbers. </li></ul>'
+                  language: EN
+                fee:
+                - id: 1
+                  description: TARIFA MAS 10GB cuotamensual
+                  type: RecurringCharge
+                  subtype: ServiceFee
+                  recurrence_scheme: BoundToBillCycle
+                  recurrence_interval: 0
+                  paid_in_advance: "false"
+                  value:
+                  - id: TARIFA MAS 10GB cuotamensual value euro
+                    value: 12.31405
+                    currency: euro
+                  terms: []
+                free_units_package:
+                - id: 444
+                  name: BONO BAJADA GRATUITO
+                  marketing_name: BONO BAJADA GRATUITO
+                  unit_amount: 2684354560
+                  is_recurring_package: "true"
+                  max_grants: 0
+                  recurrence_scheme: BoundToBillCycle
+                  applicability_priority: 1
+                  package_type_name: DATOS
+                  is_mandatory: "true"
+                  is_mandatory_optional: "false"
+                  is_mandatory_for_sale: "false"
+                  fee: []
+                  promotion: []
+                - id: 469
+                  name: INTERNET 10GB_TPILI
+                  marketing_name: INTERNET 10GB_TPILI
+                  unit_amount: 10737418240
+                  is_recurring_package: "true"
+                  max_grants: 0
+                  recurrence_scheme: BoundToBillCycle
+                  applicability_priority: 1
+                  package_type_name: DATOS
+                  is_mandatory: "true"
+                  is_mandatory_optional: "false"
+                  is_mandatory_for_sale: "false"
+                  fee: []
+                  promotion: []
+                promotion:
+                - id: 174
+                  name: MM_DTO 3EUR DURANTE 12 MESES
+                  marketing_name: MM_DTO 3EUR DURANTE 12 MESES
+                  need_promotion_code: "false"
+                  applicability_model: FeeGeneration
+                  target_applicability_rule: FeeSubtype
+                  fee_subtypes: ServiceFee
+                  calculation_model: Flat
+                  discount_type: fixed
+                  value:
+                  - id: MM_DTO 3EUR DURANTE 12 MESES value euro
+                    value: 2.479339
+                    currency: euro
+                  duration: 12
+                  keep_on_upgrade: "true"
+                  keep_on_downgrade: "true"
+                  is_mandatory: "true"
+                  terms:
+                  - id: 11
+                    name: 12 MESES-29,75E
+                    type: CommitmentContract
+                    commitment_duration: 12
+                    value:
+                    - id: 12 MESES-29,75E value euro
+                      value: 29.75
+                      currency: euro
+                    penalty_prorated: "false"
+  /catalogue/commercial_products/{id}:
+    get:
+      tags:
+      - Catalogue
+      summary: Get basic commercial product definition by ID
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Commercial product
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommercialProductBasic'
+              example:
+                id: 341
+                name: TARIFA MAS 10GB
+                marketing_name: TARIFA MAS 10GB
+                in_catalog_since: 2019-11-20 00:00:00
+                in_catalog_until: 2080-12-31 23:59:59
+                mysim_commercial_product_id: "770"
+                billing_type:
+                  id: 1
+                  name: POSPAGO
+                  description: modalidad postpago
+                fee:
+                - id: 1
+                  description: TARIFA MAS 10GB cuotamensual
+                  type: RecurringCharge
+                  subtype: ServiceFee
+                  recurrence_scheme: BoundToBillCycle
+                  recurrence_interval: 0
+                  paid_in_advance: "false"
+                  value:
+                  - id: TARIFA MAS 10GB cuotamensual value euro
+                    value: 12.31405
+                    currency: euro
+                  from: 2019-11-20 00:00:00
+                  terms: []
+  /catalogue/commercial_products/{id}/free_units_packages:
+    get:
+      tags:
+      - Catalogue
+      summary: Get free units packages related to a given commercial product
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Free Units Package
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FreeUnitsPackageDetail'
+              example:
+              - id: 444
+                name: BONO BAJADA GRATUITO
+                marketing_name: BONO BAJADA GRATUITO
+                in_catalog_since: 2019-11-20 00:00:00
+                unit_amount: 2684354560
+                is_recurring_package: "true"
+                max_grants: 0
+                recurrence_scheme: BoundToBillCycle
+                applicability_priority: 1
+                package_type_name: DATOS
+                from: 2019-11-20 00:00:00
+                is_mandatory: "true"
+                is_mandatory_optional: "false"
+                is_mandatory_for_sale: "false"
+                fee: []
+                promotion: []
+                base_profile:
+                - id: 4442
+                  name: BONO BAJADA GRATUITO JSC
+                  in_catalog_since: 2019-11-20 00:00:00
+                  network_id: "1"
+                  network_provisioning_id: BAJADA_VELOCIDAD_GRATUITA_2.5GB
+                - id: 4445
+                  name: BONO BAJADA GRATUITO YOIGO
+                  in_catalog_since: 2019-11-20 00:00:00
+                  network_id: "2"
+              - id: 469
+                name: INTERNET 10GB_TPILI
+                marketing_name: INTERNET 10GB_TPILI
+                in_catalog_since: 2019-11-20 00:00:00
+                unit_amount: 10737418240
+                is_recurring_package: "true"
+                max_grants: 0
+                recurrence_scheme: BoundToBillCycle
+                applicability_priority: 1
+                package_type_name: DATOS
+                from: 2019-11-20 00:00:00
+                is_mandatory: "true"
+                is_mandatory_optional: "false"
+                is_mandatory_for_sale: "false"
+                fee: []
+                promotion: []
+                base_profile:
+                - id: 4442
+                  name: INTERNET 10GB_TPILI JSC
+                  in_catalog_since: 2019-11-20 00:00:00
+                  network_id: "1"
+                  network_provisioning_id: INTERNET_TPILI_10GB
+                - id: 4445
+                  name: INTERNET 10GB_TPILI YOIGO
+                  in_catalog_since: 2019-11-20 00:00:00
+                  network_id: "2"
+  /catalogue/commercial_products/{id}/promotions:
+    get:
+      tags:
+      - Catalogue
+      summary: Get promotions related to a given commercial product
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Promotion
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PromotionDetail'
+              example:
+              - id: 174
+                name: MM_DTO 3EUR DURANTE 12 MESES
+                marketing_name: MM_DTO 3EUR DURANTE 12 MESES
+                in_catalog_since: 2019-11-20 00:00:00
+                need_promotion_code: "false"
+                applicability_model: FeeGeneration
+                target_applicability_rule: FeeSubtype
+                fee_subtypes: ServiceFee
+                calculation_model: Flat
+                discount_type: fixed
+                value:
+                - id: MM_DTO 3EUR DURANTE 12 MESES value euro
+                  value: 2.479339
+                  currency: euro
+                duration: 12
+                keep_on_upgrade: "true"
+                keep_on_downgrade: "true"
+                from: 2019-11-20 00:00:00
+                is_mandatory: "true"
+                terms:
+                - id: 11
+                  name: 12 MESES-29,75E
+                  type: CommitmentContract
+                  commitment_duration: 12
+                  value:
+                  - id: 12 MESES-29,75E value euro
+                    value: 29.75
+                    currency: euro
+                  penalty_prorated: "false"
+                  from: 2019-11-20 00:00:00
+  /catalogue/commercial_products/{id}/commercial_devices:
+    get:
+      tags:
+      - Catalogue
+      summary: Get commercial devices related to a given commercial product
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Commercial Device
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommercialDeviceDetail'
+              example:
+              - id: 579153
+                from: 2019-11-20 00:00:00
+                is_mandatory: "false"
+                device:
+                  id: P045A1SNC
+                  brand: ALCATEL
+                  model: ALCATEL 1S NEGRO
+                  name: ALCATEL 1S NEGRO
+                  in_catalog_since: 2019-11-20 00:00:00
+                  description: 'ALCATEL 1S NEGRO: 5,5”, LTE, ANDROID 9, OCTA-CORE
+                    (4X1,5GHZ+4X1,2GHZ), 3GB RAM + 32GB ROM, DUAL SIM, BATERÍA 3060MAH'
+                  category: handset
+                  colour: NEGRO
+                  from: 2019-11-20 00:00:00
+                fee:
+                - id: 1
+                  description: 579153 pagoupfront
+                  type: UpfrontFee
+                  subtype: UpfrontFee
+                  value:
+                  - id: 579153 pagoupfront value euro
+                    value: 0
+                    currency: euro
+                  from: 2019-11-20 00:00:00
+                  terms:
+                  - id: 55
+                    name: 24 MESES-75E
+                    type: CommitmentContract
+                    commitment_duration: 24
+                    value:
+                    - id: 24 MESES-75E value euro
+                      value: 75
+                      currency: euro
+                    penalty_prorated: "false"
+                    from: 2019-11-20 00:00:00
+              - id: 579148
+                from: 2019-11-20 00:00:00
+                is_mandatory: "false"
+                device:
+                  id: P075A39NC
+                  brand: ZTE
+                  model: ZTE BLADE A3 2019 NEGRO
+                  name: ZTE BLADE A3 2019 NEGRO
+                  in_catalog_since: 2019-11-20 00:00:00
+                  description: 'ZTE BLADE A3 NEGRO: 5”, LTE, ANDROID 9, QUAD CORE
+                    (1,5GHZ), 1GB RAM + 16GB ROM, DUAL SIM, BATERÍA 2000MAH'
+                  category: handset
+                  colour: NEGRO
+                  from: 2019-11-20 00:00:00
+                fee:
+                - id: 1
+                  description: 579148 pagoupfront
+                  type: UpfrontFee
+                  subtype: UpfrontFee
+                  value:
+                  - id: 579148 pagoupfront value euro
+                    value: 0
+                    currency: euro
+                  from: 2019-11-20 00:00:00
+                  terms:
+                  - id: 54
+                    name: 24 MESES-50E
+                    type: CommitmentContract
+                    commitment_duration: 24
+                    value:
+                    - id: 24 MESES-50E value euro
+                      value: 50
+                      currency: euro
+                    penalty_prorated: "false"
+                    from: 2019-11-20 00:00:00
+  /catalogue/commercial_products/{id}/rate_plan:
+    get:
+      tags:
+      - Catalogue
+      summary: Get rate plan related to a given commercial product
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: RatePlan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RatePlan'
+              example:
+                id: TARIFA_MAS_BASE
+  /catalogue/commercial_products/{id}/base_profiles:
+    get:
+      tags:
+      - Catalogue
+      summary: Get base profiles related to a given commercial product
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Base Profile
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/BaseProfile'
+              example:
+              - id: 61
+                name: PERFIL MOVIL 4G
+                in_catalog_since: 2019-11-20 00:00:00
+                network_id: "1"
+                network_provisioning_id: TARIFA_MAS_BASE
+                service:
+                - id: 1
+                  name: VOZ
+                  description: VOZ
+                  in_catalog_since: 2019-11-20 00:00:00
+                  from: 2019-11-20 00:00:00
+                  default_initial_status: INSTALADO
+                  activate_on_network_provisioning: "true"
+                - id: 2
+                  name: BUZON VOZ
+                  description: BUZON VOZ
+                  in_catalog_since: 2019-11-20 00:00:00
+                  from: 2019-11-20 00:00:00
+                  default_initial_status: BLOQUEO TEMPORAL
+                  activate_on_network_provisioning: "false"
+              - id: 62
+                name: PERFIL MOVIL 4G
+                in_catalog_since: 2019-11-20 00:00:00
+                network_id: "2"
+                network_provisioning_id: MM_INT_VC_10G
+                service_class: "2900"
+                service:
+                - id: 1
+                  name: VOZ
+                  description: VOZ
+                  in_catalog_since: 2019-11-20 00:00:00
+                  from: 2019-11-20 00:00:00
+                  default_initial_status: INSTALADO
+                  activate_on_network_provisioning: "true"
+                - id: 2
+                  name: BUZON VOZ
+                  description: BUZON VOZ
+                  in_catalog_since: 2019-11-20 00:00:00
+                  from: 2019-11-20 00:00:00
+                  default_initial_status: BLOQUEO TEMPORAL
+                  activate_on_network_provisioning: "false"
+  /catalogue/commercial_products/{id}/value_added_services:
+    get:
+      tags:
+      - Catalogue
+      summary: Get value added services related to a given commercial product
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Value Added Service
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ValueAddedServiceDetail'
+              example:
+              - id: 261
+                marketing_name: IP FIJA
+                in_catalog_since: 2019-11-20 00:00:00
+                from: 2019-11-20 00:00:00
+                is_mandatory: "false"
+                max_cardinality: "1"
+                service:
+                - id: 26
+                  name: IP FIJA
+                  description: IP FIJA
+                  in_catalog_since: 2019-11-20 00:00:00
+                  from: 2019-11-20 00:00:00
+                  default_initial_status: PRE-ACTIVADO
+                fee:
+                - id: 1000
+                  description: 26 cuotaservicio
+                  type: RecurringCharge
+                  subtype: ServiceFee
+                  recurrence_scheme: BoundToBillCycle
+                  recurrence_interval: 0
+                  paid_in_advance: "false"
+                  value:
+                  - id: 26 cuotaservicio value euro
+                    value: 12
+                    currency: euro
+                  terms: []
+                commercial_device: []
+                promotion: []
+  /catalogue/free_units_packages:
+    get:
+      tags:
+      - Catalogue
+      summary: Get free units packages
+      parameters:
+      - name: commercial_product_id
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: sale_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Venta
+          - Migración
+          - Añadir Línea
+          - Cartera
+      - name: channel_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - NUEVA
+          - PORTABILIDAD
+          - CENTRO DE ATENCION AL CLIENTE
+          - MIGRACION CONTRATO
+          - REEMPLAZO
+          - YOSOYMAS
+          - PORTAL DE DISTRIBUICION
+          - CANAL ONLINE (AFILIADO)
+          - MARCA BLANCA (MAYORISTA)
+          - PORTABILIDAD MARCAS
+          - MIGRACION HAPPYMOVIL
+      - name: center_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: user_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Free units packages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FreeUnitsPackage'
+              example:
+              - id: 663
+                name: BONO 350 MINUTOS EXTRA 12 MESES
+                marketing_name: BONO 350 MINUTOS EXTRA 12 MESES
+                unit_amount: 21000
+                is_recurring_package: "true"
+                max_grants: 11
+                recurrence_scheme: BoundToBillCycle
+                applicability_priority: 1
+                package_type_name: VOZ
+                is_mandatory: "false"
+                is_mandatory_optional: "false"
+                is_mandatory_for_sale: "false"
+                fee:
+                - id: 3
+                  description: BONO 350 MINUTOS EXTRA 12 MESES cargo
+                  type: RecurringCharge
+                  subtype: ServiceFee
+                  recurrence_scheme: BoundToBillCycle
+                  recurrence_interval: 0
+                  paid_in_advance: "false"
+                  value:
+                  - id: BONO 350 MINUTOS EXTRA 12 MESES cargo value euro
+                    value: 10.991735
+                    currency: euro
+                  terms: []
+                promotion:
+                - id: 247
+                  name: MM_PROMO_BONO 350 MIN EXTRA 12M
+                  marketing_name: MM_PROMO_BONO 350 MIN EXTRA 12M
+                  needPromotion_code: "false"
+                  applicability_model: FeeGeneration
+                  targetApplicability_rule: FeeSubtype
+                  fee_subtypes: ServiceFee
+                  calculation_model: Flat
+                  discount_type: fixed
+                  value:
+                  - id: MM_PROMO_BONO 350 MIN EXTRA 12M value euro
+                    value: 10.991735
+                    currency: euro
+                  duration: 11
+                  keep_on_upgrade: "true"
+                  keep_on_downgrade: "true"
+                  is_mandatory: "true"
+                  terms: []
+              - id: 70
+                name: BONOPREPAGO5GB_AMPLIACION
+                marketing_name: BONOPREPAGO5GB_AMPLIACION
+                unit_amount: 5368709120
+                is_recurring_package: "false"
+                max_grants: 0
+                applicability_priority: 1
+                package_type_name: DATOS
+                is_mandatory: "false"
+                is_mandatory_optional: "false"
+                is_mandatory_for_sale: "false"
+                fee:
+                - id: 3
+                  description: BONOPREPAGO5GB_AMPLIACION cargo
+                  type: OneTimeFee
+                  subtype: ActivationFee
+                  value:
+                  - id: BONOPREPAGO5GB_AMPLIACION cargo value euro
+                    value: 5
+                    currency: euro
+                  terms: []
+                promotion: []
+              - id: 70
+                name: VOZ 150MIN TCIPREPAGO
+                marketing_name: VOZ 150MIN TCIPREPAGO
+                unit_amount: 9000
+                is_recurring_package: "false"
+                max_grants: 0
+                applicability_priority: 1
+                package_type_name: VOZ
+                is_mandatory: "false"
+                is_mandatory_optional: "false"
+                is_mandatory_for_sale: "false"
+                fee:
+                - id: 3
+                  description: VOZ 150MIN TCIPREPAGO cargo
+                  type: OneTimeFee
+                  subtype: ActivationFee
+                  value:
+                  - id: VOZ 150MIN TCIPREPAGO cargo value euro
+                    value: 5
+                    currency: euro
+                  terms: []
+                promotion: []
+  /catalogue/promotions:
+    get:
+      tags:
+      - Catalogue
+      summary: Get promotinos
+      parameters:
+      - name: commercial_product_id
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: sale_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Venta
+          - Migración
+          - Añadir Línea
+          - Cartera
+      - name: channel_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - NUEVA
+          - PORTABILIDAD
+          - CENTRO DE ATENCION AL CLIENTE
+          - MIGRACION CONTRATO
+          - REEMPLAZO
+          - YOSOYMAS
+          - PORTAL DE DISTRIBUICION
+          - CANAL ONLINE (AFILIADO)
+          - MARCA BLANCA (MAYORISTA)
+          - PORTABILIDAD MARCAS
+          - MIGRACION HAPPYMOVIL
+      - name: customer_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Nuevo
+          - Existente
+      - name: numeration_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Nuevo numero
+          - Numero portado
+          - Numero entre marcas
+      - name: center_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: user_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Promotions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Promotion'
+              example:
+              - id: 266
+                name: MM_8% DTO_COLECTIVOS
+                marketing_name: Descuento 8% para colectivos
+                need_promotion_code: "true"
+                applicability_model: FeeGeneration
+                targe_applicability_rule: FeeSubtype
+                fee_subtypes: ServiceFee
+                calculation_model: Flat
+                discount_type: percentage
+                value:
+                - id: MM_8% DTO_COLECTIVOS value euro
+                  value: 8
+                  currency: euro
+                duration: 0
+                keep_on_upgrade: "true"
+                keep_on_downgrade: "true"
+                is_mandatory: "false"
+                terms: []
+              - id: 315
+                name: MM_20%_DTO_MOVIL_36M
+                marketing_name: DTO 20% CUOTA DE MOVIL 36 MESES
+                need_promotion_code: "false"
+                applicability_model: FeeGeneration
+                target_applicability_rule: FeeSubtype
+                fee_subtypes: ServiceFee
+                calculation_model: Flat
+                discount_type: percentage
+                value:
+                - id: MM_20%_DTO_MOVIL_36M value euro
+                  value: 20
+                  currency: euro
+                duration: 0
+                keep_on_upgrade: "true"
+                keep_on_downgrade: "true"
+                is_mandatory: "false"
+                terms: []
+  /catalogue/commercial_devices:
+    get:
+      tags:
+      - Catalogue
+      summary: Get commercial devices
+      parameters:
+      - name: commercial_product_id
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: sale_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Venta
+          - Migración
+          - Añadir Línea
+          - Cartera
+      - name: numeration_type_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+          enum:
+          - Nuevo numero
+          - Numero portado
+          - Numero entre marcas
+      - name: center_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: user_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Commercial devices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommercialDevice'
+              example:
+              - id: 579153
+                device:
+                  id: P045A1SNC
+                  brand: ALCATEL
+                  model: ALCATEL 1S NEGRO
+                  name: ALCATEL 1S NEGRO
+                  description: 'ALCATEL 1S NEGRO: 5,5”, LTE, ANDROID 9, OCTA-CORE
+                    (4X1,5GHZ+4X1,2GHZ), 3GB RAM + 32GB ROM, DUAL SIM, BATERÍA 3060MAH'
+                  category: handset
+                  colour: NEGRO
+                fee:
+                - id: 1
+                  description: 579153 pagoupfront
+                  type: UpfrontFee
+                  subtype: UpfrontFee
+                  value:
+                  - id: 579153 pagoupfront value euro
+                    value: 0
+                    currency: euro
+                  terms:
+                  - id: 55
+                    name: 24 MESES-75E
+                    type: CommitmentContract
+                    commitment_duration: 24
+                    value:
+                    - id: 24 MESES-75E value euro
+                      value: 75
+                      currency: euro
+                    penalty_prorated: "false"
+                installment_plan: []
+              - id: 579148
+                device:
+                  id: P075A39NC
+                  brand: ZTE
+                  model: ZTE BLADE A3 2019 NEGRO
+                  name: ZTE BLADE A3 2019 NEGRO
+                  description: 'ZTE BLADE A3 NEGRO: 5”, LTE, ANDROID 9, QUAD CORE
+                    (1,5GHZ), 1GB RAM + 16GB ROM, DUAL SIM, BATERÍA 2000MAH'
+                  category: handset
+                  colour: NEGRO
+                fee:
+                - id: 1
+                  description: 579148 pagoupfront
+                  type: UpfrontFee
+                  subtype: UpfrontFee
+                  value:
+                  - id: 579148 pagoupfront value euro
+                    value: 0
+                    currency: euro
+                  terms:
+                  - id: 54
+                    name: 24 MESES-50E
+                    type: CommitmentContract
+                    commitment_duration: 24
+                    value:
+                    - id: 24 MESES-50E value euro
+                      value: 50
+                      currency: euro
+                    penalty_prorated: "false"
+                installment_plan: []
+  /catalogue/commercial_products/{id}/can-switch:
+    get:
+      tags:
+      - Catalogue
+      summary: Get commercial products to which a given commercial product can be
+        changed
+      parameters:
+      - name: id
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: user_profile
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: center_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      - name: user_name
+        in: query
+        required: false
+        style: form
+        explode: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Commercial products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommercialProduct'
+              example:
+              - id: 123
+                name: TARIFA CERO PREPAGO 50MIN+1GB
+                marketing_name: TARIFA CERO PREPAGO 50MIN+1GB
+                fee:
+                - id: 1
+                  description: TARIFA CERO cuotamensual
+                  type: RecurringCharge
+                  subtype: ServiceFee
+                  recurrence_scheme: NonBoundToBillCycle
+                  recurrence_interval: 28
+                  paid_in_advance: "false"
+                  value:
+                  - id: TARIFA CERO cuotamensual value euro
+                    value: 23.5
+                    currency: euro
+                  terms: []
+                free_units_package:
+                - id: 175
+                  name: VOZ 50MIN TCPREPAGO
+                  marketing_name: VOZ 50MIN TCPREPAGO
+                  unit_amount: 3000
+                  is_recurring_package: "true"
+                  max_grants: 0
+                  recurrence_scheme: NonBoundToBillCycle
+                  recurrence_interval_type: BoundToActivation
+                  recurrence_interval_value: 28
+                  applicability_priority: 1
+                  package_type_name: VOZ
+                  is_mandatory: "true"
+                  is_mandatory_optional: "false"
+                  is_mandatory_for_sale: "false"
+                  fee: []
+                  promotion: []
+                - id: 177
+                  name: INTERNET 1GB TCPREPAGO
+                  marketing_name: INTERNET 1GB TCPREPAGO
+                  unit_amount: 1073741824
+                  is_recurring_package: "true"
+                  max_grants: 0
+                  recurrence_scheme: NonBoundToBillCycle
+                  recurrence_interval_type: BoundToActivation
+                  recurrence_interval_value: 28
+                  applicability_priority: 1
+                  package_type_name: DATOS
+                  is_mandatory: "true"
+                  is_mandatory_optional: "false"
+                  is_mandatory_for_sale: "false"
+                  fee: []
+                  promotion: []
+                - id: 178
+                  name: BAJADA VELOCIDAD PREPAGO
+                  marketing_name: BAJADA VELOCIDAD PREPAGO
+                  unit_amount: 104857600
+                  is_recurring_package: "true"
+                  max_grants: 0
+                  recurrence_scheme: NonBoundToBillCycle
+                  recurrence_interval_type: BoundToActivation
+                  recurrence_interval_value: 28
+                  applicability_priority: 1
+                  package_type_name: DATOS
+                  is_mandatory: "true"
+                  is_mandatory_optional: "false"
+                  is_mandatory_for_sale: "false"
+                  fee: []
+                  promotion: []
+                promotion: []
+              - id: 153
+                name: Tarifa Base Prepagament
+                marketing_name: Tarifa Base Prepagament
+                fee:
+                - id: 3
+                  description: Tarifa Base Prepagament conminimo
+                  type: RecurringCharge
+                  subtype: MinimumConsumption
+                  recurrence_scheme: BoundToBillCycle
+                  recurrence_interval: 0
+                  paid_in_advance: "false"
+                  value:
+                  - id: Tarifa Base Prepagament conminimo value euro
+                    value: 1
+                    currency: euro
+                  terms: []
+                freeUnitsPackage: []
+                promotion: []
+              - id: 770
+                name: TARIFA MAS 10GB
+                marketing_name: TARIFA MAS 10GB
+                fee:
+                - id: 1
+                  description: TARIFA MAS 10GB cuotamensual
+                  type: RecurringCharge
+                  subtype: ServiceFee
+                  recurrence_scheme: BoundToBillCycle
+                  recurrence_interval: 0
+                  paid_in_advance: "false"
+                  value:
+                  - id: TARIFA MAS 10GB cuotamensual value euro
+                    value: 12.31405
+                    currency: euro
+                  terms: []
+                freeUnitsPackage:
+                - id: 444
+                  name: BONO BAJADA GRATUITO
+                  marketing_name: BONO BAJADA GRATUITO
+                  unit_amount: 2684354560
+                  is_recurring_package: "true"
+                  max_grants: 0
+                  recurrence_scheme: BoundToBillCycle
+                  applicability_priority: 1
+                  package_type_name: DATOS
+                  is_mandatory: "true"
+                  is_mandatory_optional: "false"
+                  is_mandatory_for_sale: "false"
+                  fee: []
+                  promotion: []
+                - id: 469
+                  name: INTERNET 10GB_TPILI
+                  marketing_name: INTERNET 10GB_TPILI
+                  unit_amount: 10737418240
+                  is_recurring_package: "true"
+                  max_grants: 0
+                  recurrence_scheme: BoundToBillCycle
+                  applicability_priority: 1
+                  package_type_name: DATOS
+                  is_mandatory: "true"
+                  is_mandatory_optional: "false"
+                  is_mandatory_for_sale: "false"
+                  fee: []
+                  promotion: []
+                promotion:
+                - id: 174
+                  name: MM_DTO 3EUR DURANTE 12 MESES
+                  marketing_name: MM_DTO 3EUR DURANTE 12 MESES
+                  need_promotion_code: "false"
+                  applicability_model: FeeGeneration
+                  target_applicability_rule: FeeSubtype
+                  fee_subtypes: ServiceFee
+                  calculation_model: Flat
+                  discount_type: fixed
+                  value:
+                  - id: MM_DTO 3EUR DURANTE 12 MESES value euro
+                    value: 2.479339
+                    currency: euro
+                  duration: 12
+                  keep_on_upgrade: "true"
+                  keep_on_downgrade: "true"
+                  is_mandatory: "true"
+                  terms:
+                  - id: 11
+                    name: 12 MESES-29,75E
+                    type: CommitmentContract
+                    commitment_duration: 12
+                    value:
+                    - id: 12 MESES-29,75E value euro
+                      value: 29.75
+                      currency: euro
+                    penalty_prorated: "false"
+components:
+  schemas:
+    CommercialProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    CommercialDevice:
+      type: object
+      properties:
+        id:
+          type: string
+        device:
+          $ref: '#/components/schemas/CommercialDevice_device'
+        fee:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommercialDevice_fee'
+        installment_plan:
+          $ref: '#/components/schemas/CommercialDevice_installment_plan'
+    Terms:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - PermanenceContract
+          - ActivationCommitment
+          - ReturnCommitment
+        commitment_duration:
+          type: integer
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Value'
+        penalty_prorated:
+          type: boolean
+    Fee:
+      type: object
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum:
+          - RecurringCharge
+          - OneTimeFee
+        subtype:
+          type: string
+          enum:
+          - ServiceFee
+          - MinimumConsumption
+          - ActivationFee
+          - InstallationFee
+          - SuspensionServiceFee
+          - DeliveryFee
+          - UpfrontFee
+          - InstallmentFee
+        recurrence_scheme:
+          type: string
+          enum:
+          - BoundToBillCycle
+          - NonBoundToBillCycle
+        recurrence_interval:
+          type: integer
+        paid_in_advance:
+          type: boolean
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Value'
+        terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Terms'
+    Promotion:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        marketing_name:
+          type: string
+        need_promotion_code:
+          type: boolean
+        applicability_model:
+          type: string
+          enum:
+          - FeeGeneration
+          - Billing
+          - TopUp
+        target_applicability_rule:
+          type: string
+          enum:
+          - PreviousInvoiceTotalAmount
+          - CurrentInvoiceTotalAmount
+          - FeeSubtype
+        fee_subtypes:
+          type: string
+        calculation_model:
+          type: string
+          enum:
+          - Flat
+          - Bulk
+        discount_type:
+          type: string
+          enum:
+          - Percentage
+          - Fixed
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Value'
+        duration:
+          type: number
+        keep_on_upgrade:
+          type: boolean
+        keep_on_downgrade:
+          type: boolean
+        is_mandatory:
+          type: boolean
+        terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Terms'
+    FreeUnitsPackage:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        marketing_name:
+          type: string
+        unit_amount:
+          type: integer
+        isRecurring_package:
+          type: boolean
+        max_grants:
+          type: integer
+        recurrence_scheme:
+          type: string
+          enum:
+          - BoundToBillCycle
+          - NonBoundToBillCycle
+        recurrence_interval_type:
+          type: string
+          enum:
+          - Weekly
+          - Daily
+          - Monthly
+          - BoundToActivation
+        recurrence_interval_value:
+          type: integer
+        applicability_rule:
+          type: string
+          enum:
+          - ByPackageType
+        applicability_priority:
+          type: integer
+        package_type_name:
+          type: string
+        is_mandatory:
+          type: boolean
+        is_mandatory_optional:
+          type: boolean
+        is_mandatory_for_sale:
+          type: boolean
+        fee:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fee'
+        promotion:
+          type: array
+          items:
+            $ref: '#/components/schemas/Promotion'
+    CommercialProduct:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        marketing_name:
+          type: string
+        commercial_info:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommercialInfo'
+        fee:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fee'
+        free_units_package:
+          type: array
+          items:
+            $ref: '#/components/schemas/FreeUnitsPackage'
+        promotion:
+          type: array
+          items:
+            $ref: '#/components/schemas/Promotion'
+    Value:
+      type: object
+      properties:
+        id:
+          type: string
+        value:
+          type: number
+        currency:
+          type: string
+    CommercialInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        commercial_description:
+          type: number
+        language:
+          type: string
+    CommercialProductBasic:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        marketing_name:
+          type: string
+        in_catalog_since:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        in_catalog_until:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        mysim_commercial_product_id:
+          type: string
+        billing_type:
+          $ref: '#/components/schemas/CommercialProductBasic_billing_type'
+        fee:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeeDetail'
+    FeeDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        description:
+          type: string
+        type:
+          type: string
+          enum:
+          - RecurringCharge
+          - OneTimeFee
+        subtype:
+          type: string
+          enum:
+          - ServiceFee
+          - MinimumConsumption
+          - ActivationFee
+          - InstallationFee
+          - SuspensionServiceFee
+          - DeliveryFee
+          - UpfrontFee
+          - InstallmentFee
+        recurrence_scheme:
+          type: string
+          enum:
+          - BoundToBillCycle
+          - NonBoundToBillCycle
+        recurrence_interval:
+          type: integer
+        paid_in_advance:
+          type: boolean
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Value'
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/TermsDetail'
+    PromotionDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        marketing_name:
+          type: string
+        in_catalog_since:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        in_catalog_until:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        need_promotion_code:
+          type: boolean
+        applicability_model:
+          type: string
+          enum:
+          - FeeGeneration
+          - Billing
+          - TopUp
+        target_applicability_rule:
+          type: string
+          enum:
+          - PreviousInvoiceTotalAmount
+          - CurrentInvoiceTotalAmount
+          - FeeSubtype
+        fee_subtypes:
+          type: string
+        calculation_model:
+          type: string
+          enum:
+          - Flat
+          - Bulk
+        discount_type:
+          type: string
+          enum:
+          - Percentage
+          - Fixed
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Value'
+        duration:
+          type: number
+        keep_on_upgrade:
+          type: boolean
+        keep_on_downgrade:
+          type: boolean
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        is_mandatory:
+          type: boolean
+        terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/TermsDetail'
+    FreeUnitsPackageDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        marketing_name:
+          type: string
+        in_catalog_since:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        in_catalog_until:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        mysim_free_units_package_id:
+          type: string
+        unit_amount:
+          type: integer
+        isRecurring_package:
+          type: boolean
+        max_grants:
+          type: integer
+        recurrence_scheme:
+          type: string
+          enum:
+          - BoundToBillCycle
+          - NonBoundToBillCycle
+        recurrence_interval_type:
+          type: string
+          enum:
+          - Weekly
+          - daily
+          - monthly
+          - BoundToActivation
+        recurrence_interval_value:
+          type: integer
+        applicability_rule:
+          type: string
+          enum:
+          - ByPackageType
+        applicability_priority:
+          type: integer
+        package_type_name:
+          type: string
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        is_mandatory:
+          type: boolean
+        is_mandatory_optional:
+          type: boolean
+        is_mandatory_for_sale:
+          type: boolean
+        fee:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeeDetail'
+        promotion:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromotionDetail'
+        base_profile:
+          type: array
+          items:
+            $ref: '#/components/schemas/FreeUnitsPackageDetail_base_profile'
+    TermsDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+          - PermanenceContract
+          - ActivationCommitment
+          - ReturnCommitment
+        commitment_duration:
+          type: integer
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Value'
+        penalty_prorated:
+          type: boolean
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+    CommercialDeviceDetail:
+      type: object
+      properties:
+        id:
+          type: string
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        is_mandatory:
+          type: boolean
+        device:
+          $ref: '#/components/schemas/CommercialDeviceDetail_device'
+        fee:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommercialDeviceDetail_fee'
+        installment_plan:
+          $ref: '#/components/schemas/CommercialDeviceDetail_installment_plan'
+    RatePlan:
+      type: object
+      properties:
+        id:
+          type: string
+    BaseProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        in_catalog_since:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        in_catalog_until:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        network_id:
+          type: string
+        network_provisioning_id:
+          type: string
+        service_class:
+          type: string
+        offer_id:
+          type: string
+        charging_id:
+          type: string
+        manual_renewal:
+          type: boolean
+        service:
+          type: array
+          items:
+            $ref: '#/components/schemas/BaseProfile_service'
+    ValueAddedServiceDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+        marketing_name:
+          type: string
+        in_catalog_since:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        in_catalog_until:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        is_mandatory:
+          type: boolean
+        max_cardinality:
+          type: integer
+        service:
+          type: array
+          items:
+            $ref: '#/components/schemas/ValueAddedServiceDetail_service'
+        fee:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeeDetail'
+        promotion:
+          type: array
+          items:
+            $ref: '#/components/schemas/PromotionDetail'
+        commercial_device:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommercialDeviceDetail'
+    CommercialDevice_device:
+      type: object
+      properties:
+        id:
+          type: string
+        brand:
+          type: string
+        model:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+          enum:
+          - Handset
+          - STB
+          - VoiceBox
+          - Tablet
+          - Router
+          - SmartTV
+          - GameConsole
+          - Others
+        colour:
+          type: string
+    CommercialDevice_fee:
+      type: object
+      properties:
+        id:
+          type: integer
+        description:
+          type: string
+        type:
+          type: string
+          enum:
+          - RecurringCharge
+          - OneTimeFee
+        subtype:
+          type: string
+          enum:
+          - ServiceFee
+          - MinimumConsumption
+          - ActivationFee
+          - InstallationFee
+          - SuspensionServiceFee
+          - DeliveryFee
+          - UpfrontFee
+          - InstallmentFee
+        recurrence_scheme:
+          type: string
+          enum:
+          - BoundToBillCycle
+          - NonBoundToBillCycle
+        recurrence_interval:
+          type: integer
+        paid_in_advance:
+          type: boolean
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Value'
+        terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Terms'
+    CommercialDevice_installment_plan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        duration:
+          type: integer
+        fee:
+          type: array
+          items:
+            $ref: '#/components/schemas/Fee'
+        terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Terms'
+    CommercialProductBasic_billing_type:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+    FreeUnitsPackageDetail_base_profile:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        in_catalog_since:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        in_catalog_until:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        network_id:
+          type: string
+        network_provisioning_id:
+          type: string
+        offer_id:
+          type: string
+        charging_id:
+          type: string
+        expire_with_tariff:
+          type: boolean
+    CommercialDeviceDetail_device:
+      type: object
+      properties:
+        id:
+          type: string
+        brand:
+          type: string
+        model:
+          type: string
+        name:
+          type: string
+        in_catalog_since:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        in_catalog_until:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        description:
+          type: string
+        category:
+          type: string
+          enum:
+          - Handset
+          - STB
+          - VoiceBox
+          - Tablet
+          - Router
+          - SmartTV
+          - GameConsole
+          - Others
+        colour:
+          type: string
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+    CommercialDeviceDetail_fee:
+      type: object
+      properties:
+        id:
+          type: integer
+        description:
+          type: string
+        type:
+          type: string
+          enum:
+          - RecurringCharge
+          - OneTimeFee
+        subtype:
+          type: string
+          enum:
+          - ServiceFee
+          - MinimumConsumption
+          - ActivationFee
+          - InstallationFee
+          - SuspensionServiceFee
+          - DeliveryFee
+          - UpfrontFee
+          - InstallmentFee
+        recurrence_scheme:
+          type: string
+          enum:
+          - BoundToBillCycle
+          - NonBoundToBillCycle
+        recurrence_interval:
+          type: integer
+        paid_in_advance:
+          type: boolean
+        value:
+          type: array
+          items:
+            $ref: '#/components/schemas/Value'
+        terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/Terms'
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+    CommercialDeviceDetail_installment_plan:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        duration:
+          type: integer
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        fee:
+          type: array
+          items:
+            $ref: '#/components/schemas/FeeDetail'
+        terms:
+          type: array
+          items:
+            $ref: '#/components/schemas/TermsDetail'
+    BaseProfile_service:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        in_catalog_since:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        in_catalog_until:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        default_initial_status:
+          type: string
+        activate_on_network_provisioning:
+          type: boolean
+        language:
+          type: string
+        speed:
+          type: integer
+    ValueAddedServiceDetail_service:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        description:
+          type: string
+        in_catalog_since:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        in_catalog_until:
+          type: string
+          format: yyyy-MM-dd HH:mm:ss
+        from:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        to:
+          type: string
+          format: YYYY-MM-dd HH:mm:ss
+        default_initial_status:
+          type: string
