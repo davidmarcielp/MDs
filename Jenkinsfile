@@ -275,7 +275,6 @@ pipeline {
                 }
             }
         }
-    }
     
         stage('Initialize Repository Configuration') {
             steps {
