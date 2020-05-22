@@ -256,9 +256,9 @@ pipeline {
                         echo "headCommit " + headCommit
                         env.HEAD_COMMIT = headCommit
                     
-                        /*git url: REPOSITORY,
-                        credentialsId: CREDENTIALS,
-                        branch: BRANCH */
+                        git url: REPOSITORY,
+                            credentialsId: CREDENTIALS,
+                            branch: BRANCH
                     }
 
                 }
