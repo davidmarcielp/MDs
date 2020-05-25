@@ -800,11 +800,7 @@ PUBLISH/en/docs/${name}/${version1}/${highestVersionInFolderName}"
                         withCredentials([usernamePassword(credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                             
                             sh '''#!/bin/bash
-
-                                echo "status:"
-                                git status
-
-                                #echo "set url:"
+                            
                                 git remote set-url origin "https://${USERNAME}:${PASSWORD}@$UPLOAD"
                                 git config user.email "HUGO AUTOMATED SYSTEM"
                                 git config user.name  "HUGO AUTOMATED SYSTEM"
