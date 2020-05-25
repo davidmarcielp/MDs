@@ -811,9 +811,9 @@ PUBLISH/en/docs/${name}/${version1}/${highestVersionInFolderName}"
                                 git status
 
                                 #echo "set url:"
-                                #git remote set-url origin "https://${USERNAME}:${PASSWORD}@$UPLOAD"
-                                #git config user.email "HUGO AUTOMATED SYSTEM"
-                                #git config user.name  "HUGO AUTOMATED SYSTEM"
+                                git remote set-url origin "https://${USERNAME}:${PASSWORD}@$UPLOAD"
+                                git config user.email "HUGO AUTOMATED SYSTEM"
+                                git config user.name  "HUGO AUTOMATED SYSTEM"
                                 
                                 echo "add:"
                                 #push to documentation branch
