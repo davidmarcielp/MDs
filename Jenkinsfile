@@ -753,6 +753,9 @@ PUBLISH/en/docs/${name}/${version1}/${highestVersionInFolderName}"
                                     
                                 fi
                             done
+
+                            echo "status"
+                            git status
                         '''
                         }catch (err){
                             echo 'Enrichment of the DRAFT has failed'
@@ -807,10 +810,10 @@ PUBLISH/en/docs/${name}/${version1}/${highestVersionInFolderName}"
                                 echo "status:"
                                 git status
 
-                                echo "set url:"
-                                git remote set-url origin "https://${USERNAME}:${PASSWORD}@$UPLOAD"
-                                git config user.email "HUGO AUTOMATED SYSTEM"
-                                git config user.name  "HUGO AUTOMATED SYSTEM"
+                                #echo "set url:"
+                                #git remote set-url origin "https://${USERNAME}:${PASSWORD}@$UPLOAD"
+                                #git config user.email "HUGO AUTOMATED SYSTEM"
+                                #git config user.name  "HUGO AUTOMATED SYSTEM"
                                 
                                 echo "add:"
                                 #push to documentation branch
