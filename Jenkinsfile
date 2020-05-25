@@ -259,8 +259,10 @@ pipeline {
                             echo $HEAD_COMMIT > head_commit
                             echo "head commit $HEAD_COMMIT"
                             
-                            git rev-list $var_current_commit..$HEAD_COMMIT > missing_commits_file
-                            #git rev-list $HEAD_COMMIT..$var_current_commit > missing_commits_file
+
+                            #git rev-list $var_current_commit..$HEAD_COMMIT > missing_commits_file
+                            #debug this later
+                            git log -10 --format=%H > missing_commits_file
                             
                             cat missing_commits_file | while read line; do
                                 echo "COMMIT : "+$line
