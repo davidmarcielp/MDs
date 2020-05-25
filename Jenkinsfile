@@ -269,7 +269,7 @@ pipeline {
                                 echo "-----------------------------------"
                                 git diff-tree --no-commit-id --name-only -r $line >> missing_changes_file
                             done
-                            
+                             
                             echo "Updating current commit with last commit fetched"
                             
                             echo $HEAD_COMMIT > current_commit
