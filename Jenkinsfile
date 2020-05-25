@@ -527,9 +527,9 @@ pipeline {
                     if( myAPIChanges.isAPIChanged()) {
                         sh '''#!/bin/bash
                         
-                        MDS_FOLDER="MDs/"
+                        MDS_FOLDER="MDs/en/docs/"
                         if [ ! -d "$MDS_FOLDER" ]; then
-                            mkdir $MDS_FOLDER
+                            mkdir -R $MDS_FOLDER
                         fi
                         DRAFT_FOLDER="DRAFT/"
                         if [ ! -d "$DRAFT_FOLDER" ]; then
@@ -575,6 +575,9 @@ pipeline {
                             version2="${version#*.}"
                             version2="${version2%.*}"
                             version3="${version##*.}"
+
+                            echo "name $name"
+                            echo "version $version"
                             
                             if [ ! -d "MDs/en/docs/$name" ]; then
                                 mkdir -p MDs/en/docs/$name
