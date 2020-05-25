@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.1
 info:
   description: |
     Sergio CONFLICTO! This is the API for authn in MM
