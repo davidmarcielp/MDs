@@ -3,7 +3,7 @@ info:
   description: >-
     CAMBIO 4  API que recoge todas las funcionalidades relativas a los recibos gestionados
     por la Mutua Madrileña Muy Madrileña en su distintos.   
-  version: 3.4.3
+  version: 3.4.4
   title: CROSS - RECIBOS
   contact:
     name: Javier Moreno Lozano
