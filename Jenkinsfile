@@ -177,9 +177,6 @@ def init()
     def added_files = ""
 	def modified_files = ""
 	APIChanges innerAPIChanges = new APIChanges();
-    //innerAPIChanges.setHeadCommit(current_commit.id)
-	//innerAPIChanges.setAPIsRoutes(added_files);
-	//innerAPIChanges.setAPIsRoutes(modified_files);
 	return  innerAPIChanges
 }
 
@@ -202,6 +199,7 @@ pipeline {
         REPOSITORY = 'https://github.com/davidmarcielp/MDs' // Direccion del repositorio
         UPLOAD = 'github.com/davidmarcielp/MDs' // Direccion del repositorio
         CREDENTIALS = 'developer-portal' // Credenciales de acceso al repositorio
+        //CREDENTIALS = '806bdc4e-af90-4255-83fc-b434c30a6720' // Credenciales de acceso al repositorio
         BRANCH = 'documentation' // Rama de trabajo
         MAIN_BRANCH = 'master' // Rama principal del trabajo
         HEAD_COMMIT = '' // String con el identificador del HEAD_COMMIT
@@ -232,7 +230,7 @@ pipeline {
                     // La siguiente sentencia establece un bloque en el que el valor de HEAD COMMIT es modificado por el identificador almacenado
                     // Tambien se accede al script bash con las credenciales indicadas anteriormente
     	        
-                    withCredentials([usernamePassword(credentialsId: '806bdc4e-af90-4255-83fc-b434c30a6720', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                         sh '''#!/bin/bash
                             COMMIT_FILE=current_commit 
 
@@ -297,10 +295,6 @@ pipeline {
                         env.HEAD_COMMIT = headCommit
                         
                         myAPIChanges = init()
-
-                        /*git url: REPOSITORY,
-                            credentialsId: CREDENTIALS,
-                            branch: BRANCH*/
                     }
 
 
@@ -803,7 +797,7 @@ PUBLISH/en/docs/${name}/${version1}/${highestVersionInFolderName}"
                     *   2. Se establece el usuario y su email
                     * 3. Se realiza un commit con las APIs afectadas.
                     */
-                        withCredentials([usernamePassword(credentialsId: '806bdc4e-af90-4255-83fc-b434c30a6720', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        withCredentials([usernamePassword(credentialsId: CREDENTIALS, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                             
                             sh '''#!/bin/bash
 
@@ -815,7 +809,6 @@ PUBLISH/en/docs/${name}/${version1}/${highestVersionInFolderName}"
                                 git config user.email "HUGO AUTOMATED SYSTEM"
                                 git config user.name  "HUGO AUTOMATED SYSTEM"
                                 
-                                echo "add:"
                                 #push to documentation branch
                                 git add -A
                                 git commit -m "HUGO AUTOMATIC COMMIT"
