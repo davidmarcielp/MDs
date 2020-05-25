@@ -1,4 +1,4 @@
-openapi: 3.2.2
+openapi: 3.2.3
 title: Data Set
 servers:
   - url: '{scheme}://developer.uspto.gov/ds-api'
