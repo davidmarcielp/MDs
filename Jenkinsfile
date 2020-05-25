@@ -803,10 +803,16 @@ PUBLISH/en/docs/${name}/${version1}/${highestVersionInFolderName}"
                         withCredentials([usernamePassword(credentialsId: '806bdc4e-af90-4255-83fc-b434c30a6720', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
                             
                             sh '''#!/bin/bash
+
+                                echo "status:"
+                                git status
+
+                                echo "set url:"
                                 git remote set-url origin "https://${USERNAME}:${PASSWORD}@$UPLOAD"
                                 git config user.email "HUGO AUTOMATED SYSTEM"
                                 git config user.name  "HUGO AUTOMATED SYSTEM"
                                 
+                                echo "add:"
                                 #push to documentation branch
                                 git add -A
                                 git commit -m "HUGO AUTOMATIC COMMIT"
