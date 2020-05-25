@@ -4,7 +4,7 @@ servers:
   - url: '{scheme}://developer.uspto.gov/ds-api'
     variables:
       scheme:
-        description: ' The Data Set API is accessible via https and http'
+        description: 'The Data Set API is accessible via https and http'
         enum:
           - 'https'
           - 'http'
