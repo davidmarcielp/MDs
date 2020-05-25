@@ -223,6 +223,7 @@ pipeline {
                                 echo "There is no previous commit registered, take HEAD instead"
                                 git rev-parse HEAD
                                 git rev-parse HEAD > current_commit
+                                cat current_commit
                             fi
                             
 
