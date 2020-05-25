@@ -234,9 +234,10 @@ pipeline {
                             #fi
 
                             var_current_commit=$(cat current_commit)
+                            echo "var_current_commit $var_current_commit"
                             if [[ -z "$var_current_commit" ]]; then
                                 var_current_commit=$(git log --format="%H" -n 2)
-                                echo "var_current_commit$var_current_commit"
+                                echo "var_current_commit $var_current_commit"
                             fi
 
                             echo "current commit $var_current_commit"
