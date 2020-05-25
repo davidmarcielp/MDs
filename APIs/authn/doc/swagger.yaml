@@ -5,7 +5,7 @@ info:
     Mira esto!
     Llamada!
     Otra! mas.
-    Y otra! 
+    Y otra!
 
     ## Security:
     Paths | Authorization header
@@ -19,7 +19,7 @@ info:
 
 tags:
   - name: Applications
-    description: API for managing applications
+    description: API for managing applications a
   - name: Clients
     description: API for managing OAuth2 clients and associate them to applications.
   - name: Administration

@@ -524,13 +524,13 @@ pipeline {
                         if [ ! -d "$MDS_FOLDER" ]; then
                             mkdir -R $MDS_FOLDER
                         fi
-                        DRAFT_FOLDER="DRAFT/"
+                        DRAFT_FOLDER="DRAFT/en/docs/"
                         if [ ! -d "$DRAFT_FOLDER" ]; then
-                            mkdir $DRAFT_FOLDER
+                            mkdir -R $DRAFT_FOLDER
                         fi
                         PUBLISH_FOLDER="PUBLISH/"
                         if [ ! -d "$PUBLISH_FOLDER" ]; then
-                            mkdir $PUBLISH_FOLDER
+                            mkdir -R $PUBLISH_FOLDER
                         fi
                         '''
                     }
