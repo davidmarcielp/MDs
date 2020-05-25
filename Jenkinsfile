@@ -260,9 +260,14 @@ pipeline {
 
                             echo "head_commit $HEAD_COMMIT"
                             echo "current_commit $current_commit"
+                            echo "var_current_commit $var_current_commit"
                             
+                            echo "missing_changes_file"
+                            cat missing_changes_file
+
                         '''
                     }
+
 
                     env.WORKSPACE = pwd()
                     echo "env.WORKSPACE " + env.WORKSPACE
@@ -279,6 +284,8 @@ pipeline {
                             credentialsId: CREDENTIALS,
                             branch: BRANCH*/
                     }
+
+                    myAPIChanges =compute_API_affected(head_commit)
 
                     // Turn the file into a valid array
                     def missing_commits = readFile(file: 'missing_changes_file').split('\n')
