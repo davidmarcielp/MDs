@@ -761,7 +761,7 @@ collapsible: true
                         if [[ -f missing_changes_file ]]; then
                             rm missing_changes_file
                         fi
-                        rm -rf files workspace
+                        #rm -rf files workspace
                     '''
                     }
                 }
