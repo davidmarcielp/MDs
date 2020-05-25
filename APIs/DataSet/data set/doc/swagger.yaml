@@ -11,7 +11,7 @@ servers:
         default: 'https'
 info:
   description: >-
-    The Data  Set API (DSAPI) allows the public users to discover and search
+    The Data set API (DSAPI) allows the public users to discover and search
     USPTO exported data sets. This is a generic API that allows USPTO users to
     make any CSV based data files searchable through API. With the help of GET
     call, it returns the list of data fields that are searchable. With the help
