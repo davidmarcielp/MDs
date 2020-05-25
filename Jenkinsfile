@@ -301,7 +301,7 @@ pipeline {
                         echo "headCommit " + headCommit
                         env.HEAD_COMMIT = headCommit
                         
-                        myAPIChanges = init(headCommit)
+                        myAPIChanges = init()
 
                         /*git url: REPOSITORY,
                             credentialsId: CREDENTIALS,
