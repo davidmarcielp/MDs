@@ -279,13 +279,14 @@ pipeline {
                         headCommit = readFile "${env.WORKSPACE}/head_commit"
                         echo "headCommit " + headCommit
                         env.HEAD_COMMIT = headCommit
-                    
+                        
+                        myAPIChanges =compute_API_affected(head_commit)
+                        
                         /*git url: REPOSITORY,
                             credentialsId: CREDENTIALS,
                             branch: BRANCH*/
                     }
 
-                    myAPIChanges =compute_API_affected(head_commit)
 
                     // Turn the file into a valid array
                     def missing_commits = readFile(file: 'missing_changes_file').split('\n')
