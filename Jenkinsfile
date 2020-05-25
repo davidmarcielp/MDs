@@ -233,10 +233,11 @@ pipeline {
                             #    var_current_commit=$(cat current_commit)
                             #fi
 
-                            #var_current_commit=$(cat current_commit)
-                            #if [[ -z "$var_current_commit" ]]; then
-                            #    var_current_commit=$(git log --format="%H" -n 2)
-                            #fi
+                            var_current_commit=$(cat current_commit)
+                            if [[ -z "$var_current_commit" ]]; then
+                                var_current_commit=$(git log --format="%H" -n 2)
+                                echo "var_current_commit$var_current_commit"
+                            fi
 
                             echo "current commit $var_current_commit"
                             HEAD_COMMIT=$(git log --format="%H" -n 1)
