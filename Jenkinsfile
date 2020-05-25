@@ -627,6 +627,10 @@ collapsible: true
                     */
                         sh '''#!/bin/bash
                         
+                        echo "workspace: "
+                        ls workspace
+                        echo "---"
+
                         #create version folders
                         ls workspace | while read line; do
                         
@@ -669,6 +673,9 @@ collapsible: true
                                 cd ../../../../..
                             fi
     
+
+                            echo "copy: workspace/$line , MDs/en/docs/${name}/${version1}/${line}"
+
                             #copy file to MDs
                             cp workspace/$line MDs/en/docs/${name}/${version1}/${line}
                             
@@ -701,6 +708,10 @@ collapsible: true
                         try {
                         sh '''#!/bin/bash
                             
+                            echo "workspace: "
+                            ls workspace
+                            echo "---"
+                            
                             ls workspace | while read line; do
                             
                                 #extract information from name
@@ -729,6 +740,10 @@ collapsible: true
                                     highestVersionInFolderName="$(basename -- "$highestVersionInFolder")"
                                     
                                     echo "highestVersionInFolder $highestVersionInFolder"
+                                    echo "merge 
+DRAFT/en/docs/${name}/${version1}/${line} 
+MDs/en/docs/${name}/${version1}/${highestVersionInFolderName} 
+PUBLISH/en/docs/${name}/${version1}/${highestVersionInFolderName}"
                                     
                                     #merge file with enriched file
                                     git merge-file \
