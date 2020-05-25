@@ -559,6 +559,7 @@ pipeline {
 
                         echo "workspace: "
                         ls workspace
+                        echo "---"
                         
                         ls workspace | while read line; do
 
