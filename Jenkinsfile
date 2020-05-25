@@ -199,11 +199,11 @@ pipeline {
         * Es posible no obstante con el valor withEnv modificar PARA una fase en concreto el valor de alguna de las variables aqui presentadas 
         */
         ROUTE_LIST = myAPIChanges.getAPIsRoutesToString() // Tiene la lista actual de rutas en formato String
-        REPOSITORY = 'https://github.com/masmovil/developer-portal' // Direccion del repositorio
+        REPOSITORY = 'https://github.com/davidmarcielp/MDs' // Direccion del repositorio
+        UPLOAD = 'github.com/davidmarcielp/MDs' // Direccion del repositorio
         CREDENTIALS = 'developer-portal' // Credenciales de acceso al repositorio
         BRANCH = 'documentation' // Rama de trabajo
         MAIN_BRANCH = 'master' // Rama principal del trabajo
-        UPLOAD = 'github.com/masmovil/developer-portal' // Direccion del repositorio
         HEAD_COMMIT = '' // String con el identificador del HEAD_COMMIT
     }
 
