@@ -221,6 +221,7 @@ pipeline {
                             
                             if [[ ! -f "$COMMIT_FILE" ]]; then
                                 echo "There is no previous commit registered, take HEAD instead"
+                                git rev-parse HEAD
                                 git rev-parse HEAD > current_commit
                             fi
                             
