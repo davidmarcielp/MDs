@@ -325,44 +325,7 @@ pipeline {
                 }
             }
         }
-        
-        stage('Push to Git2') {
-            steps {
-                script {
-                                            /*
-                    * Descripcion:
-                    *   Si y solo si hay APIs afectadas:
-                    * ---------Script bash
-                    *  0- Con las credenciales correspondientes
-                    *  1. Se establece la url del repositorio remoto
-                    *   2. Se establece el usuario y su email
-                    * 3. Se realiza un commit con las APIs afectadas.
-                    */
-                        withCredentials([usernamePassword(credentialsId: '806bdc4e-af90-4255-83fc-b434c30a6720', usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
-                            
-                            sh '''#!/bin/bash
-                                git remote set-url origin "https://${USERNAME}:${PASSWORD}@$UPLOAD"
-                                git config user.email "HUGO AUTOMATED SYSTEM"
-                                git config user.name  "HUGO AUTOMATED SYSTEM"
-                                
-                rm -rf DRAFT/en/docs/REAL_API_doc_swagger MDs/en/docs/REAL_API_doc_swagger
-
-                git pull
                 
-                                #push to documentation branch
-                                git add -A
-                                git commit -m "HUGO AUTOMATIC COMMIT"
-                                git push --set-upstream origin HEAD:documentation
-                                echo "Last affected commit:"
-                                cat current_commit
-                                '''
-                        }
-                    
-                }
-            }
-        }
-    
-        
         stage('Checking Last Commit Affected Files') {
             steps {
                 script {
