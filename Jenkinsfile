@@ -231,10 +231,10 @@ pipeline {
                             #    var_current_commit=$(cat current_commit)
                             #fi
 
-                            var_current_commit=$(cat current_commit)
-                            if [[ -z "$var_current_commit" ]]; then
-                                var_current_commit=$(git log --format="%H" -n 2)
-                            fi
+                            #var_current_commit=$(cat current_commit)
+                            #if [[ -z "$var_current_commit" ]]; then
+                            #    var_current_commit=$(git log --format="%H" -n 2)
+                            #fi
 
                             echo "current commit $var_current_commit"
                             HEAD_COMMIT=$(git log --format="%H" -n 1)
@@ -253,6 +253,9 @@ pipeline {
                             echo "Updating current commit with last commit fetched"
                             
                             echo $HEAD_COMMIT > current_commit
+
+                            echo "head_commit $HEAD_COMMIT"
+                            echo "current_commit $current_commit"
                             
                         '''
                     }
