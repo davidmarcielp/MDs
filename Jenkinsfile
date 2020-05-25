@@ -559,6 +559,9 @@ pipeline {
                     *  1.3 Se crea _index.md en DRAFT necesario para HUGO
                     */
                         sh '''#!/bin/bash
+
+                        echo "workspace: "
+                        ls workspace
                         
                         ls workspace | while read line; do
 
