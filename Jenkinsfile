@@ -162,6 +162,27 @@ def compute_API_affected(current_commit)
 	return  innerAPIChanges
 }
 
+def init()
+{
+    /*
+    *   Input: current_commit -> JSON que se corresponde al head_commit o commit de cabecera, valor correspondiente al payload enviado 
+    *                           desde el commit de cabecera. 
+    *   Output: innerAPIChanges -> Objeto del tipo APIChanges y creado en este metodo, con los valores del commit de cabecera ya incluidos.
+    *   Descripcion: Esta funcion( no metodo dado que no pertenece a ninguna clase)
+    *    crea el objeto APIChanges que se usará a lo largo del Job, y lo inicializa con los valores del commit de cabecera, en concreto:
+    *       - Envia al objeto APIChanges el id del commit de cabecera.
+    *       - Envia al objeto APIChanges las rutas de los ficheros anadidos en el commit actual.
+    *       - Envia al objeto APIChanges las rutas de los ficheros modificados en el commit actual.
+    */
+    def added_files = ""
+	def modified_files = ""
+	APIChanges innerAPIChanges = new APIChanges();
+    //innerAPIChanges.setHeadCommit(current_commit.id)
+	//innerAPIChanges.setAPIsRoutes(added_files);
+	//innerAPIChanges.setAPIsRoutes(modified_files);
+	return  innerAPIChanges
+}
+
 
 APIChanges myAPIChanges = new APIChanges() // Se crea el objeto myAPIChanges fuera de la directiva de pipeline, con el objetivo de tener acceso al objeto desde todas las fases.
 pipeline {
@@ -280,7 +301,7 @@ pipeline {
                         echo "headCommit " + headCommit
                         env.HEAD_COMMIT = headCommit
                         
-                        myAPIChanges =compute_API_affected(headCommit)
+                        myAPIChanges = init(headCommit)
 
                         /*git url: REPOSITORY,
                             credentialsId: CREDENTIALS,
