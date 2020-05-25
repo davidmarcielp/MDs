@@ -25,7 +25,7 @@ paths:
       parameters:
         - name: tags
           in: query
-          description: tags to filter by a
+          description: tags to filter by aa
           required: false
           style: form
           schema:

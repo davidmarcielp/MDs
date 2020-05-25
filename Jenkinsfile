@@ -532,6 +532,8 @@ pipeline {
                         if [ ! -d "$PUBLISH_FOLDER" ]; then
                             mkdir -R $PUBLISH_FOLDER
                         fi
+
+                        echo "folders created"
                         '''
                     }
                 }
@@ -574,11 +576,13 @@ pipeline {
                             
                             if [ ! -d "MDs/en/docs/$name" ]; then
                                 mkdir -p MDs/en/docs/$name
+                                echo "created MDs/en/docs/$name"
                             fi
                             
                             if [ ! -d "DRAFT/en/docs/$name" ]; then
                             
                                 mkdir -p DRAFT/en/docs/$name
+                                echo "created DRAFT/en/docs/$name"
                                 
                                 #create the _index.md file (required by hugo) for the endpoint
                                 title=$(cat workspace/$line | grep -m 1 -h "title: " | head -1)
@@ -668,6 +672,7 @@ collapsible: true
                             #copy file to draft
                             cp workspace/$line DRAFT/en/docs/${name}/${version1}/${line}
                             
+                            echo "end version folders"
                         done
                     '''
                     }
@@ -757,7 +762,7 @@ collapsible: true
                         if [[ -f missing_changes_file ]]; then
                             rm missing_changes_file
                         fi
-                        #rm -rf files workspace
+                        rm -rf files workspace
                     '''
                     }
                 }

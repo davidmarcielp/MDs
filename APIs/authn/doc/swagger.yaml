@@ -19,7 +19,7 @@ info:
 
 tags:
   - name: Applications
-    description: API for managing applications a
+    description: API for managing applications aa
   - name: Clients
     description: API for managing OAuth2 clients and associate them to applications.
   - name: Administration
