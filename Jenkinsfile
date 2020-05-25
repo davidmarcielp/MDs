@@ -280,8 +280,8 @@ pipeline {
                         echo "headCommit " + headCommit
                         env.HEAD_COMMIT = headCommit
                         
-                        myAPIChanges =compute_API_affected(head_commit)
-                        
+                        myAPIChanges =compute_API_affected(headCommit)
+
                         /*git url: REPOSITORY,
                             credentialsId: CREDENTIALS,
                             branch: BRANCH*/
