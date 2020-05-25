@@ -246,14 +246,7 @@ pipeline {
                                 git rev-parse HEAD > current_commit
                                 cat current_commit
                             fi
-                            
-
-                            #if [[ "$COMMIT_FILE" == "current_commit" ]]; then
-                            #    var_current_commit=$(git log --format="%H" -n 2)
-                            #else
-                            #    var_current_commit=$(cat current_commit)
-                            #fi
-
+                             
                             var_current_commit=$(cat current_commit)
                             echo "var_current_commit $var_current_commit"
                             if [[ -z "$var_current_commit" ]]; then
